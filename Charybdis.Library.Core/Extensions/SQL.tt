@@ -1,0 +1,12 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ output extension=".cs" #>
+using System.Data.SqlClient;
+<# 
+string db = "sql";
+string Db = "Sql";
+string DB = "SQL";
+string DbType = "SqlDbType";
+string prefix = "s";
+#>
+<#@ include file="DB.tt" #>

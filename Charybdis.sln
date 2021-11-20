@@ -1,0 +1,117 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charybdis", "Charybdis\Charybdis.csproj", "{7DE9D937-8DAE-44F8-BA84-38A62BDFEA85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charybdis.Library.Core", "Charybdis.Library.Core\Charybdis.Library.Core.csproj", "{528E2AF0-D1D6-404F-AFE4-6EC943CB945B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charybdis.ARPG", "Charybdis.ARPG\Charybdis.ARPG.csproj", "{A565E0FB-4FFD-4F2E-809C-BB9973E2982B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charybdis.MonoGame", "Charybdis.MonoGame\Charybdis.MonoGame.csproj", "{ACDEF9EE-FA58-481A-A1B8-23F818897E8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charybdis.Science", "Charybdis.Science\Charybdis.Science.csproj", "{A0DEF6F1-9CC3-47DA-89D2-523232A7C3F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charybdis.Neural", "Charybdis.Neural\Charybdis.Neural.csproj", "{40A70540-E9D8-4708-8F31-A88446BBA63E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charybdis.RayTracer", "RayTracer\Charybdis.RayTracer.csproj", "{AF55A50D-6281-49AE-9404-D8A8E76D892E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvolutionSimulator", "EvolutionSimulator\EvolutionSimulator.csproj", "{A68723EA-E971-406E-8FB1-F02E37A6D625}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space", "Space\Space.csproj", "{2B74AD36-668D-4108-97DE-89EAA96A6125}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fortress", "Fortress\Fortress.csproj", "{1B28DD6D-E24E-431E-AA56-24B1615278F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infinitum", "Infinitum\Infinitum.csproj", "{02612C89-7D91-4299-94ED-B42EC4B59FEE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AllButNeuralRelease|Any CPU = AllButNeuralRelease|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DE9D937-8DAE-44F8-BA84-38A62BDFEA85}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE9D937-8DAE-44F8-BA84-38A62BDFEA85}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{7DE9D937-8DAE-44F8-BA84-38A62BDFEA85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE9D937-8DAE-44F8-BA84-38A62BDFEA85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE9D937-8DAE-44F8-BA84-38A62BDFEA85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE9D937-8DAE-44F8-BA84-38A62BDFEA85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{528E2AF0-D1D6-404F-AFE4-6EC943CB945B}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{528E2AF0-D1D6-404F-AFE4-6EC943CB945B}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{528E2AF0-D1D6-404F-AFE4-6EC943CB945B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{528E2AF0-D1D6-404F-AFE4-6EC943CB945B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{528E2AF0-D1D6-404F-AFE4-6EC943CB945B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{528E2AF0-D1D6-404F-AFE4-6EC943CB945B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A565E0FB-4FFD-4F2E-809C-BB9973E2982B}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{A565E0FB-4FFD-4F2E-809C-BB9973E2982B}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{A565E0FB-4FFD-4F2E-809C-BB9973E2982B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A565E0FB-4FFD-4F2E-809C-BB9973E2982B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A565E0FB-4FFD-4F2E-809C-BB9973E2982B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A565E0FB-4FFD-4F2E-809C-BB9973E2982B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACDEF9EE-FA58-481A-A1B8-23F818897E8F}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{ACDEF9EE-FA58-481A-A1B8-23F818897E8F}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{ACDEF9EE-FA58-481A-A1B8-23F818897E8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACDEF9EE-FA58-481A-A1B8-23F818897E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACDEF9EE-FA58-481A-A1B8-23F818897E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACDEF9EE-FA58-481A-A1B8-23F818897E8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0DEF6F1-9CC3-47DA-89D2-523232A7C3F6}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{A0DEF6F1-9CC3-47DA-89D2-523232A7C3F6}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{A0DEF6F1-9CC3-47DA-89D2-523232A7C3F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0DEF6F1-9CC3-47DA-89D2-523232A7C3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0DEF6F1-9CC3-47DA-89D2-523232A7C3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0DEF6F1-9CC3-47DA-89D2-523232A7C3F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40A70540-E9D8-4708-8F31-A88446BBA63E}.AllButNeuralRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{40A70540-E9D8-4708-8F31-A88446BBA63E}.AllButNeuralRelease|Any CPU.Build.0 = Debug|Any CPU
+		{40A70540-E9D8-4708-8F31-A88446BBA63E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40A70540-E9D8-4708-8F31-A88446BBA63E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40A70540-E9D8-4708-8F31-A88446BBA63E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40A70540-E9D8-4708-8F31-A88446BBA63E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF55A50D-6281-49AE-9404-D8A8E76D892E}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{AF55A50D-6281-49AE-9404-D8A8E76D892E}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{AF55A50D-6281-49AE-9404-D8A8E76D892E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF55A50D-6281-49AE-9404-D8A8E76D892E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF55A50D-6281-49AE-9404-D8A8E76D892E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF55A50D-6281-49AE-9404-D8A8E76D892E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A68723EA-E971-406E-8FB1-F02E37A6D625}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{A68723EA-E971-406E-8FB1-F02E37A6D625}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{A68723EA-E971-406E-8FB1-F02E37A6D625}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A68723EA-E971-406E-8FB1-F02E37A6D625}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A68723EA-E971-406E-8FB1-F02E37A6D625}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A68723EA-E971-406E-8FB1-F02E37A6D625}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B74AD36-668D-4108-97DE-89EAA96A6125}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{2B74AD36-668D-4108-97DE-89EAA96A6125}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{2B74AD36-668D-4108-97DE-89EAA96A6125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B74AD36-668D-4108-97DE-89EAA96A6125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B74AD36-668D-4108-97DE-89EAA96A6125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B74AD36-668D-4108-97DE-89EAA96A6125}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B28DD6D-E24E-431E-AA56-24B1615278F8}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{1B28DD6D-E24E-431E-AA56-24B1615278F8}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{1B28DD6D-E24E-431E-AA56-24B1615278F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B28DD6D-E24E-431E-AA56-24B1615278F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B28DD6D-E24E-431E-AA56-24B1615278F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B28DD6D-E24E-431E-AA56-24B1615278F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D3EC64E2-2AA4-4FEB-B8FF-4C60C85DB111}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+EndGlobal
