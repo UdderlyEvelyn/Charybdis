@@ -110,6 +110,10 @@
       <Project>{a68723ea-e971-406e-8fb1-f02e37a6d625}</Project>
       <Name>EvolutionSimulator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fortress\Fortress.csproj">
+      <Project>{1b28dd6d-e24e-431e-aa56-24b1615278f8}</Project>
+      <Name>Fortress</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RayTracer\Charybdis.RayTracer.csproj">
       <Project>{af55a50d-6281-49ae-9404-d8a8e76d892e}</Project>
       <Name>Charybdis.RayTracer</Name>

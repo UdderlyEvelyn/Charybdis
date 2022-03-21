@@ -7,6 +7,7 @@ using Charybdis.Library.Core;
 using Charybdis.MonoGame;
 using Charybdis.Neural;
 using Space;
+using Fortress;
 
 namespace Charybdis
 {
@@ -24,7 +25,7 @@ namespace Charybdis
                 Console.WriteLine(
                     "Welcome to the Charybdis Project.\n" +
                     "1. Evolution Simulator\n" +
-                    //"2. Fortress (Matter State Simulator)\n" +
+                    "2. Fortress (Matter State Simulator)\n" +
                     "3. Space (4X)\n" +
                     "4. Raytracer\n" +
                     "5. Exit\n" +
@@ -38,10 +39,10 @@ namespace Charybdis
                         using (var k = new EvolutionSimulator.EvolutionSimulator()) k.Run();
                         message = "";
                         break;
-                    //case '2':
-                    //    using (var k = new FortressKernel()) k.Run();
-                    //    message = "";
-                    //    break;
+                    case '2':
+                        using (var k = new FortressKernel()) k.Run();
+                        message = "";
+                        break;
                     case '3':
                         using (var k = new SpaceKernel()) k.Run();
                         message = "";

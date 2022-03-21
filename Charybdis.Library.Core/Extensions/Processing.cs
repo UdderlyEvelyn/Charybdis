@@ -1745,6 +1745,7 @@ namespace Charybdis.Library.Core
         {
             return char.ToUpper(c);
         }
+
         /// <summary>
         /// Converts the char to an lowercase version of itself.
         /// </summary>
@@ -1755,48 +1756,5 @@ namespace Charybdis.Library.Core
         {
             return char.ToLower(c);
         }
-        /// <summary>
-        /// ParseProfileNameIntoCaseSpecimen.
-        /// This method take 4 parameters to parse out caseNumber, specimenNumber from profile name
-        /// </summary>
-        /// <param name="profileName"></param>
-        /// <param name="caseNumber"></param>
-        /// <param name="specimenNumber"></param>
-        /// <param name="caseDelimiter"></param>
-        public static void ParseProfileNameIntoCaseSpecimen(string profileName, ref string caseNumber, ref string specimenNumber, string caseDelimiter)
-        {
-            // this is zero base index
-            int _caseDelimiterPosition = profileName.IndexOf(caseDelimiter);
-            if (_caseDelimiterPosition > 0)
-            {
-                caseNumber = profileName.Substring(0, _caseDelimiterPosition);
-                specimenNumber = profileName.Substring(_caseDelimiterPosition + 1, profileName.Length - _caseDelimiterPosition - 1);
-            }
-            else
-            {
-                caseNumber = profileName;
-                specimenNumber = "";
-            }
-        }
-        /// <summary>
-        /// NextBODECaseSequenceNumber.
-        /// This method take 1 parameter to calculate the next sequence number.
-        /// based on this format AA0,AA1..AA9,AB0,AB1..AB9,etc and input can be of any length
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string NextBODECaseSequenceNumber(string s)
-        {
-            CharacterRangeSet BODE = new CharacterRangeSet
-            {
-                { new Range(2, 2), new ContiguousCharacterRange('0', '9') },
-                { new Range(0, 1), new ContiguousCharacterRange('A', 'Z') },
-            };
-            string _nextSequenceNumber = String.Empty;
-            while (s != "")
-                _nextSequenceNumber += BODE.GetNext(s);
-            return _nextSequenceNumber;
-        }
-
     }
 }

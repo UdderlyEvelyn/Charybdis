@@ -1074,7 +1074,7 @@ namespace Charybdis.Library.Core
             return t == null ? (R?)null : selector(t);
         }
 
-        [Obsolete("This method was srenamed to SelectStructOrNull to parallel the added SelectClassOrNull - please change references to reflect this so we can remove this redirection stub.")]
+        [Obsolete("This method was renamed to SelectStructOrNull to parallel the added SelectClassOrNull - please change references to reflect this so we can remove this redirection stub.")]
         public static R? SelectOrNull<T, R>(this T t, Func<T, R> selector)
             where T : class
             where R : struct
