@@ -50,7 +50,7 @@ namespace Charybdis.Library.Core
             return contents.Any(t => container.Contains(t));
         }
 
-        //Need to verify the directionality of -1/1, pretty sure it should be right, though. -JDS 3/23/17
+        //Need to verify the directionality of -1/1, pretty sure it should be right, though. -UdderlyEvelyn 3/23/17
         public static int CompareTo<T>(this T? t1, T? t2)
             where T : struct, IComparable
         {
@@ -64,7 +64,7 @@ namespace Charybdis.Library.Core
                 return 0;
         }
 
-        //Need to verify the directionality of -1/1, pretty sure it should be right, though. -JDS 3/23/17
+        //Need to verify the directionality of -1/1, pretty sure it should be right, though. -UdderlyEvelyn 3/23/17
         public static int CompareTo<T>(this T? t1, T t2)
             where T : struct, IComparable
         {

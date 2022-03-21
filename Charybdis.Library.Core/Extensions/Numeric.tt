@@ -92,7 +92,7 @@ foreach (var type in new[] { typeof(sbyte), typeof(byte), typeof(short), typeof(
 		/// </summary>
 		/// <param name="i"></param>
 		/// <returns></returns>
-		//We are using a bunch of nested conditions instead of a loop for performance reasons. - JDS
+		//We are using a bunch of nested conditions instead of a loop for performance reasons. - UdderlyEvelyn
 		public static int GetDigitLength(this <#= type.Name #> i)
 		{
 			if (i > 9) //More than 1 digit?

@@ -604,7 +604,7 @@ namespace Charybdis.Library.Core
     /// </summary>
     public class CachedType
     {
-        //More of these exist to add, not needed at this time - JDS 11/7/16
+        //More of these exist to add, not needed at this time - UdderlyEvelyn 11/7/16
         public PropertyInfo[] Properties { get; set; }
         public FieldInfo[] Fields { get; set; }
         public MethodInfo[] Methods { get; set; }

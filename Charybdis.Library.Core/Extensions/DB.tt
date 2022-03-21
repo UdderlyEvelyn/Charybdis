@@ -263,7 +263,7 @@ namespace Charybdis.Library.Core
         //The below version of CachedObject uses a variation of a hackish trick found at 
         //https://codeblog.jonskeet.uk/2010/11/02/evil-code-overload-resolution-workaround/
         //it works and makes the API nicer, but it's bad practice stuff so I decided not
-        //to use it in the name of readability and maintainability. -JDS 9/9/16
+        //to use it in the name of readability and maintainability. -UdderlyEvelyn 9/9/16
 
         /*
         //This wrapper extension method is public, but leads to one of three static methods in CachedObject and its base (compile-time overload resolution).

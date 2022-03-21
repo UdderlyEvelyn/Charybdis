@@ -29,7 +29,7 @@ namespace Charybdis.Library.Core
             using (var pc = new PrincipalContext(domain.ToLower() == "localhost" ? ContextType.Machine : ContextType.Domain, domain)) //Try local machine if local, otherwise domain.
             {
                 result = pc.ValidateCredentials(userName, password); //Validate.
-                //Not sure why this step is necessary, but replicating it because it was in place in LSAM and it might be for a certain customer or something. -JDS 1/31/17
+                //Not sure why this step is necessary, but replicating it because it was in place in LSAM and it might be for a certain customer or something. -UdderlyEvelyn 1/31/17
                 if (!result && !domain.ToLower().EndsWith(".com")) //If that doesn't work, and the domain doesn't end in ".com"..
                     pc.ValidateCredentials(userOnly + '@' + domain + ".com", password); //Try with the USER@DOMAIN.COM format.
             }

@@ -1644,38 +1644,12 @@ namespace Charybdis.Library.Core
         }
 
         /// <summary>
-        /// Returns the last digit of the year, followed by the day of the year.
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <returns></returns>
-        //FTI has been referring to what this method returns (ex. 10/20/16 -> 6294) as "Julian Day" apparently, 
-        //but it has nothing to do with an actual Julian Day Number or the Julian Calendar in general. -JDS 10/20/16
-        public static int GetLastDigitAndDayOfYear(this DateTime dt)
-        {
-            //Get the last digit of the year as a string (can't slice an int), look it up to get an int quickly, multiply it by 1000 to put it in the thousands place, and add the day of the year.
-            return Data.Digits[dt.Year.ToString()[3]] * 1000 + dt.DayOfYear;
-        }
-
-        /// <summary>
-        /// Returns the last digit of the year, followed by the day of the year - in string format (more performant than doing it in int format if you need a string in the end anyway).
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <returns></returns>
-        //FTI has been referring to what this method returns (ex. 10/20/16 -> "6294") as "Julian Day" apparently, 
-        //but it has nothing to do with an actual Julian Day Number or the Julian Calendar in general. -JDS 10/20/16
-        public static string GetLastDigitAndDayOfYearString(this DateTime dt)
-        {
-            //Get the last digit of the year and tack it onto a string representation of dt.DayOfYear forced to 3 digits to form the desired format as a string.
-            return dt.Year.ToString()[3] + dt.DayOfYear.ToString("000");
-        }
-
-        /// <summary>
         /// Get the digit count of an integer.
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
         //The if/else statements are to prevent the majority of cases from having to do the more expensive (but infinitely supported) for loop - better performance and less resource usage.
-        //More if/else can be added if we need more than 8 digits very often, and the "digits" variable must be incremented and the "j" counter adjusted for each one added. - JDS 12/5/16
+        //More if/else can be added if we need more than 8 digits very often, and the "digits" variable must be incremented and the "j" counter adjusted for each one added. -UdderlyEvelyn 12/5/16
         /*public static int GetDigitLength(this int i)
         {
             if (i > 9) //More than 1 digit?
