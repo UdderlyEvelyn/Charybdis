@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Charybdis", "Charybdis\Charybdis.csproj", "{7DE9D937-8DAE-44F8-BA84-38A62BDFEA85}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fortress", "Fortress\Fortress.csproj", "{1B28DD6D-E24E-431E-AA56-24B1615278F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infinitum", "Infinitum\Infinitum.csproj", "{02612C89-7D91-4299-94ED-B42EC4B59FEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kolony", "Kolony\Kolony.csproj", "{13FC0E74-3088-4F4E-8258-93A9DC8385F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +100,12 @@ Global
 		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02612C89-7D91-4299-94ED-B42EC4B59FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13FC0E74-3088-4F4E-8258-93A9DC8385F0}.AllButNeuralRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{13FC0E74-3088-4F4E-8258-93A9DC8385F0}.AllButNeuralRelease|Any CPU.Build.0 = Release|Any CPU
+		{13FC0E74-3088-4F4E-8258-93A9DC8385F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13FC0E74-3088-4F4E-8258-93A9DC8385F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13FC0E74-3088-4F4E-8258-93A9DC8385F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13FC0E74-3088-4F4E-8258-93A9DC8385F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

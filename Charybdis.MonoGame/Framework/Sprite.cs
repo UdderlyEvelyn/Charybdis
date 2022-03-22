@@ -15,7 +15,7 @@ namespace Charybdis.MonoGame
         public Sprite(Texture2D data)
         {
             _data = data;
-            Size = new Vec2(data.Width * Scale, data.Height * Scale);
+            Size = new Vec2(data.Width * Scale.X, data.Height * Scale.Y);
             DrawChildren = true;
             BoundingBox = new BoundingBox(new Microsoft.Xna.Framework.Vector3(Position.X, Position.Y, 0), new Microsoft.Xna.Framework.Vector3(Position.X + Size.X, Position.Y + Size.Y, 0));
         }
@@ -23,6 +23,8 @@ namespace Charybdis.MonoGame
         public BoundingBox BoundingBox;
         
         public float? Rotation;
+
+        public Vec2 Scale = Vec2.One;
 
         private Texture2D _data;
 
@@ -36,7 +38,7 @@ namespace Charybdis.MonoGame
                     position: Position.ToXNA(),
                     color: Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White,
                     rotation: Rotation.Value,
-                    scale: new Microsoft.Xna.Framework.Vector2(Scale),
+                    scale: Scale.ToXNA(),
                     origin: offset.ToXNA());
 #pragma warning restore CS0618 // Type or member is obsolete
             else
@@ -44,15 +46,13 @@ namespace Charybdis.MonoGame
                 spriteBatch.Draw(_data,
                     position: Position.ToXNA(),
                     color: Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White,
-                    scale: new Microsoft.Xna.Framework.Vector2(Scale),
+                    scale: Scale.ToXNA(),
                     origin: offset.ToXNA());
 #pragma warning restore CS0618 // Type or member is obsolete
             if (DrawChildren)
                 foreach (Drawable2 d2 in Children)
                     d2.Draw(spriteBatch, offset);
         }
-
-        public float Scale = 1;
 
         public Col4? Tint;
     }

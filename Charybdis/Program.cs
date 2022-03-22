@@ -8,6 +8,8 @@ using Charybdis.MonoGame;
 using Charybdis.Neural;
 using Space;
 using Fortress;
+using Infinitum;
+using Kolony;
 
 namespace Charybdis
 {
@@ -25,10 +27,12 @@ namespace Charybdis
                 Console.WriteLine(
                     "Welcome to the Charybdis Project.\n" +
                     "1. Evolution Simulator\n" +
-                    "2. Fortress (Matter State Simulator)\n" +
-                    "3. Space (4X)\n" +
-                    "4. Raytracer\n" +
-                    "5. Exit\n" +
+                    "2. Kolony\n" +
+                    "3. Fortress (Matter State Simulator)\n" +
+                    "4. Space (4X)\n" +
+                    "5. Raytracer\n" +
+                    "6. Infinitum\n" +
+                    "7. Exit\n" +
                     "\n" +
                     message
                     );
@@ -40,18 +44,26 @@ namespace Charybdis
                         message = "";
                         break;
                     case '2':
-                        using (var k = new FortressKernel()) k.Run();
+                        using (var k = new KolonyKernel()) k.Run();
                         message = "";
                         break;
                     case '3':
-                        using (var k = new SpaceKernel()) k.Run();
+                        using (var k = new FortressKernel()) k.Run();
                         message = "";
                         break;
                     case '4':
-                        new System.Windows.Application().Run(new RayTracer.MainWindow());
+                        using (var k = new SpaceKernel()) k.Run();
                         message = "";
                         break;
                     case '5':
+                        new System.Windows.Application().Run(new RayTracer.MainWindow());
+                        message = "";
+                        break;
+                    case '6':
+                        using (var k = new InfinitumKernel()) k.Run();
+                        message = "";
+                        break;
+                    case '7':
                         exit = true;
                         message = "";
                         break;
