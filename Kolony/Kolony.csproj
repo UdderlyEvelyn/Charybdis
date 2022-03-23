@@ -75,17 +75,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Material.cs" />
     <Compile Include="KolonyKernel.cs" />
     <Compile Include="Classes\Creatures\Creature.cs" />
     <Compile Include="Classes\Creatures\Scroble.cs" />
     <Compile Include="Classes\DestroyableObject.cs" />
     <Compile Include="Classes\KolonyObject.cs" />
-    <Compile Include="Classes\GeyserTile.cs" />
-    <Compile Include="Classes\Material.cs" />
-    <Compile Include="Classes\SpaceTile.cs" />
     <Compile Include="Classes\SurroundingTiles.cs" />
-    <Compile Include="Classes\Tile.cs" />
-    <Compile Include="Classes\VacuumTile.cs" />
+    <Compile Include="Classes\Cube.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

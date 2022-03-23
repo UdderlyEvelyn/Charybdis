@@ -10,10 +10,10 @@ namespace Kolony
 {
     public abstract class Creature : DestroyableObject
     {
-        public Pathing2<Tile> Pathing = new Pathing2<Tile>();
-        public Action<Tile> TileInteraction = null;
+        public Pathing2<Cube> Pathing = new Pathing2<Cube>();
+        public Action<Cube> TileInteraction = null;
 
-        public Creature(Array2<Tile> world, Vec2 startingPosition, Func<Tile, bool> passabilityCheck)
+        public Creature(Array2<Cube> world, Vec2 startingPosition, Func<Cube, bool> passabilityCheck)
         {
             Pathing.PassabilityCheck = passabilityCheck;
             Pathing.World = world;

@@ -6,15 +6,22 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Charybdis.Library.Core;
 using Charybdis.Science;
+using Charybdis.MonoGame;
 
 namespace Kolony
 {
-    public class SpaceTile : Tile
+    public class Cube : KolonyObject
     {
-        public SpaceTile()
+        public Cube()
         {
-            Material = Material.Vacuum;
-            Temperature = TemperatureF.AbsoluteZero;
+            SelectionEnabled = true;
+        }
+
+        public Material Material;
+
+        public override void Update()
+        {
+            /*Nothing to see here.*/
         }
     }
 }

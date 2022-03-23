@@ -13,22 +13,22 @@ namespace Kolony
         public static int WorldTileWidth;
         public static int WorldTileHeight;
 
-        public Tile TopLeft;
-        public Tile TopRight;
-        public Tile TopCenter;
-        public Tile Left;
-        public Tile Center;
-        public Tile Right;
-        public Tile BottomLeft;
-        public Tile BottomCenter;
-        public Tile BottomRight;
+        public Cube TopLeft;
+        public Cube TopRight;
+        public Cube TopCenter;
+        public Cube Left;
+        public Cube Center;
+        public Cube Right;
+        public Cube BottomLeft;
+        public Cube BottomCenter;
+        public Cube BottomRight;
 
-        public List<Tile> All;
+        public List<Cube> All;
 
         public int X;
         public int Y;
 
-        public SurroundingTiles(Array2<Tile> world, Tile t)
+        public SurroundingTiles(Array2<Cube> world, Cube t)
         {
             //TL TC TR
             // L  C  R
@@ -65,7 +65,7 @@ namespace Kolony
             if (BottomRightPossible)
                 BottomRight = world.Get(X + 1, Y + 1);
             //Build List
-            All = new List<Tile>
+            All = new List<Cube>
                 {
                     TopLeft,
                     TopRight,
