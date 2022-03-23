@@ -184,9 +184,9 @@ namespace Kolony
                 Material = Material.Stone,
                 Visual = new SpriteGroup
                         {
-                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize + 100, y * tileSize), Tint = Col3.White },
-                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize + 100, y * tileSize), Tint = Col3.Blue },
-                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize + 100, y * tileSize), Tint = Col3.Red },
+                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.White },
+                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.Blue },
+                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.Red },
                         },
                 Random = random,
                 Temperature = new TemperatureF(60),
