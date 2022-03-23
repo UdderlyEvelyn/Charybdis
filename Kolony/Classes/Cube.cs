@@ -19,6 +19,10 @@ namespace Kolony
 
         public Material Material;
 
+        public Sprite TopSprite;
+        public Sprite LeftSprite;
+        public Sprite RightSprite;
+
         public override void Update()
         {
             /*Nothing to see here.*/

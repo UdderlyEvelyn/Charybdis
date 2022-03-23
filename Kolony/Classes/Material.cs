@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Charybdis.Library.Core;
 using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
+using Charybdis.MonoGame;
 
 namespace Kolony
 {

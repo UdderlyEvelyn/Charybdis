@@ -32,22 +32,23 @@ namespace Charybdis.MonoGame
         {
             if (!DrawMe)
                 return; //Set to not draw, so abort the drawing process.            
+            var pos = (Position - offset).ToXNA();
             if (Rotation.HasValue)
 #pragma warning disable CS0618 // Type or member is obsolete
                 spriteBatch.Draw(_data,
-                    position: Position.ToXNA(),
+                    position: pos,
                     color: Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White,
                     rotation: Rotation.Value,
                     scale: Scale.ToXNA(),
-                    origin: offset.ToXNA());
+                    origin: pos + (Size / 2).ToXNA());
 #pragma warning restore CS0618 // Type or member is obsolete
             else
 #pragma warning disable CS0618 // Type or member is obsolete
                 spriteBatch.Draw(_data,
-                    position: Position.ToXNA(),
+                    position: pos,
                     color: Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White,
                     scale: Scale.ToXNA(),
-                    origin: offset.ToXNA());
+                    origin: pos + (Size / 2).ToXNA());
 #pragma warning restore CS0618 // Type or member is obsolete
             if (DrawChildren)
                 foreach (Drawable2 d2 in Children)

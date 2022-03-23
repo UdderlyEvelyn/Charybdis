@@ -68,6 +68,9 @@ namespace Kolony
         Array2<float> densityField;
         bool drawUpdateTiles = false;
         bool applyTemperatureColor = false;
+        Matrix cubeTopTransform = Matrix.CreateRotationZ(0.78539816f) * Matrix.CreateScale(new Vector3(1.1f, .9f, 1f));
+        Matrix cubeLeftTransform = Matrix.CreateRotationZ(0.78539816f) * Matrix.CreateScale(new Vector3(.75f, 1.1f, 1f));
+        Matrix cubeRightTransform = Matrix.CreateRotationZ(-0.78539816f) * Matrix.CreateScale(new Vector3(.75f, 1f, 1f));
 
         public KolonyKernel()
         {
@@ -182,12 +185,9 @@ namespace Kolony
             Cube tile = new Cube()
             {
                 Material = Material.Stone,
-                Visual = new SpriteGroup
-                        {
-                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.White },
-                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.Blue },
-                            new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.Red },
-                        },
+                TopSprite = new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.White },
+                LeftSprite = new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.Blue },
+                RightSprite = new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.Red },
                 Random = random,
                 Temperature = new TemperatureF(60),
                 Mass = ((double)(matterField.Get(x, y) * 1000)).Round(),
@@ -206,9 +206,9 @@ namespace Kolony
         protected override bool BeginDraw()
         {
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
-            cubeTopSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Matrix.CreateRotationZ(0.78539816f) * Matrix.CreateScale(new Vector3(1.1f, .9f, 1f)));
-            cubeLeftSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Matrix.CreateRotationZ(0.78539816f) * Matrix.CreateScale(new Vector3(.75f, 1.1f, 1f)));
-            cubeRightSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: Matrix.CreateRotationZ(-0.78539816f) * Matrix.CreateScale(new Vector3(.75f, 1f, 1f)));
+            cubeTopSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: cubeTopTransform);
+            cubeLeftSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: cubeLeftTransform);
+            cubeRightSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: cubeRightTransform);
             return base.BeginDraw();
         }
 
@@ -226,15 +226,18 @@ namespace Kolony
 
             Globals.VisualsLock.EnterReadLock();
 
+            var viewportBounds = new BoundingRect(viewportCursor - tileSize, viewportMax);
             foreach (var go2 in Globals.AllGameObjects)
-                if (go2.Visual != null && go2.Visual.Position.Within(viewportCursor - tileSize, viewportMax))
+                if ((go2.Visual != null && go2.Visual.Position.Within(viewportBounds) || 
+                    (go2 is Cube cube && (cube.TopSprite.Position.Within(viewportBounds) || 
+                                         cube.LeftSprite.Position.Within(viewportBounds) || 
+                                         cube.RightSprite.Position.Within(viewportBounds)))))
                 {
-                    if (go2 is Cube cube)
+                    if (go2 is Cube c)
                     {
-                        var spriteGroup = cube.Visual as SpriteGroup;
-                        spriteGroup[0].Draw(cubeTopSpriteBatch, viewportCursor);
-                        spriteGroup[1].Draw(cubeLeftSpriteBatch, viewportCursor);
-                        spriteGroup[2].Draw(cubeRightSpriteBatch, viewportCursor);
+                        c.TopSprite.Draw(cubeTopSpriteBatch, viewportCursor);
+                        c.LeftSprite.Draw(cubeLeftSpriteBatch, viewportCursor);
+                        c.RightSprite.Draw(cubeRightSpriteBatch, viewportCursor);
                     }
                     else
                         go2.Visual.Draw(spriteBatch, viewportCursor);

@@ -8,7 +8,7 @@ using Charybdis.Library.Core;
 
 namespace Charybdis.MonoGame
 {
-    public abstract class Drawable2
+    public abstract class Drawable2 : IDrawable2
     {
         public abstract void Draw(SpriteBatch spriteBatch, Vec2 offset);
         public Vec2 Position;

@@ -85,6 +85,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Framework\IDrawable2.cs" />
     <Compile Include="Framework\SpriteGroup.cs" />
     <Compile Include="Framework\UI\Button.cs" />
     <Compile Include="Globals.cs" />
