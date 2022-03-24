@@ -8,6 +8,7 @@ using Charybdis.Library.Core;
 using Charybdis.Science;
 using Charybdis.MonoGame;
 using Charybdis.Library.Core.Classes;
+using Range = Charybdis.Library.Core.Range;
 
 namespace Space
 {

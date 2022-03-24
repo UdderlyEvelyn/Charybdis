@@ -11,10 +11,10 @@ namespace Charybdis.Library.Core
 {
     public static class Encryption
     {
-        static Encryption()
-        {
-            _setKeyProtection(true);
-        }
+        //static Encryption()
+        //{
+        //    _setKeyProtection(true);
+        //}
 
         //If you change this, all existing data encrypted with this key will not be readable without manually specifying the original key to read it!
         //This should only be changed if we have a security breach and the key becomes insecure, otherwise use the methods that take a key parameter instead.
@@ -27,44 +27,44 @@ namespace Charybdis.Library.Core
                                                 0x10, 0x30, 0xFF, 0x58, 
                                                 0x99, 0x91, 0x35, 0x90 }; //32-byte (256-bit) Key
         
-        [ExcludeFromCodeCoverage] //Don't need to test a variable for code coverage when it just passes another along.
-        public static bool EncryptionKeyProtectionStatus
-        {
-            get
-            {
-                return _keyEncryptionState;
-            }
-        }
+        //[ExcludeFromCodeCoverage] //Don't need to test a variable for code coverage when it just passes another along.
+        //public static bool EncryptionKeyProtectionStatus
+        //{
+        //    get
+        //    {
+        //        return _keyEncryptionState;
+        //    }
+        //}
 
-        private static bool _keyEncryptionPossible = true;
-        private static bool _keyEncryptionState = false;
-        /// <summary>
-        /// Sets the memory holding the static encryption key to be encrypted, minimizing the chance it could be read by malicious code/etc..
-        /// </summary>
-        /// <param name="state"></param>
-        private static void _setKeyProtection(bool state)
-        {
-            if (_keyEncryptionPossible) //If key encryption is possible..
-            {
-                if (_keyEncryptionState != state) //If it isn't already in the state that's been requested..
-                {
-                    try
-                    {
-                        if (state) //If it's being encrypted..
-                            ProtectedMemory.Protect(_key, MemoryProtectionScope.SameProcess); //Encrypt the key in memory.
-                        else //If it's being decrypted..
-                            ProtectedMemory.Unprotect(_key, MemoryProtectionScope.SameProcess); //Decrypt the key in memory.
-                        _keyEncryptionState = state; //Set the state variable to the new state.
-                    }
-                    catch (System.Security.SecurityException) //Problem..
-                    {
-                        //We don't have the required permission to use the data protection in this context, so quietly move along.
-                        _keyEncryptionState = false; //Set it to false since we can't use the encryption.
-                        _keyEncryptionPossible = false; //Set this to false so we don't bother trying again (for performance).
-                    }
-                }
-            }
-        }
+        //private static bool _keyEncryptionPossible = true;
+        //private static bool _keyEncryptionState = false;
+        ///// <summary>
+        ///// Sets the memory holding the static encryption key to be encrypted, minimizing the chance it could be read by malicious code/etc..
+        ///// </summary>
+        ///// <param name="state"></param>
+        //private static void _setKeyProtection(bool state)
+        //{
+        //    if (_keyEncryptionPossible) //If key encryption is possible..
+        //    {
+        //        if (_keyEncryptionState != state) //If it isn't already in the state that's been requested..
+        //        {
+        //            try
+        //            {
+        //                if (state) //If it's being encrypted..
+        //                    ProtectedMemory.Protect(_key, MemoryProtectionScope.SameProcess); //Encrypt the key in memory.
+        //                else //If it's being decrypted..
+        //                    ProtectedMemory.Unprotect(_key, MemoryProtectionScope.SameProcess); //Decrypt the key in memory.
+        //                _keyEncryptionState = state; //Set the state variable to the new state.
+        //            }
+        //            catch (System.Security.SecurityException) //Problem..
+        //            {
+        //                //We don't have the required permission to use the data protection in this context, so quietly move along.
+        //                _keyEncryptionState = false; //Set it to false since we can't use the encryption.
+        //                _keyEncryptionPossible = false; //Set this to false so we don't bother trying again (for performance).
+        //            }
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// This uses a key to take a string and output a base64-encoded AES-encrypted string.
@@ -87,7 +87,7 @@ namespace Charybdis.Library.Core
             {
                 byte[] bytes = encoding.GetBytes(input);
                 aes.GenerateIV(); //Use random IV for every Encrypt call (insecure otherwise, though it could be generated by other random means than this method).
-                _setKeyProtection(false); //Decrypt the key so we can use it.
+                //_setKeyProtection(false); //Decrypt the key so we can use it.
                 using (var enc = aes.CreateEncryptor(key, aes.IV))
                 using (var stream = new MemoryStream())
                 using (var crypt = new CryptoStream(stream, enc, CryptoStreamMode.Write))
@@ -97,7 +97,7 @@ namespace Charybdis.Library.Core
                     crypt.FlushFinalBlock(); //If this isn't done the buffer/length/etc. of the underlying stream is all zero.
                     bytes = aes.IV.Concat(stream); //Prepend the IV and reassign the result to "bytes".
                 }
-                _setKeyProtection(true); //Encrypt the key to protect it.
+                //_setKeyProtection(true); //Encrypt the key to protect it.
                 return Convert.ToBase64String(bytes);
             }
         }
@@ -178,7 +178,7 @@ namespace Charybdis.Library.Core
                 string result;
                 bytes.Transfer(iv); //Grab the prepended IV.
                 bytes = bytes.Extract(ivSize, bytes.Length - ivSize); //Trim the prepended IV off.
-                _setKeyProtection(false); //Decrypt the key so we can use it.
+                //_setKeyProtection(false); //Decrypt the key so we can use it.
                 using (var dec = aes.CreateDecryptor(key, iv))
                 using (var stream = new MemoryStream())
                 using (var crypt = new CryptoStream(stream, dec, CryptoStreamMode.Write))
@@ -188,7 +188,7 @@ namespace Charybdis.Library.Core
                     crypt.FlushFinalBlock(); //If this isn't done the buffer/length/etc. of the underlying stream is all zero.
                     result = encoding.GetString(stream);
                 }
-                _setKeyProtection(true); //Encrypt the key to protect it.
+                //_setKeyProtection(true); //Encrypt the key to protect it.
                 return result;
             }
         }

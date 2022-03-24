@@ -15,6 +15,7 @@ using XNARectangle = Microsoft.Xna.Framework.Rectangle;
 using System.IO;
 using BoundingBox = Microsoft.Xna.Framework.BoundingBox;
 using Charybdis.Library.Core;
+using Index = Charybdis.Library.Core.Index;
 
 namespace Charybdis.MonoGame
 {
