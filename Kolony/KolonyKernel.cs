@@ -21,6 +21,7 @@ namespace Kolony
         static int minutesPerDay = 3;
         static int secondsPerDay = minutesPerDay * 60;
         static int tileSize = 32;
+        static int tileHalfSize = tileSize / 2;
         static int worldTileWidth = 320;
         static int worldTileHeight = 240;
         static int worldTileCount = worldTileWidth * worldTileHeight;
@@ -41,9 +42,6 @@ namespace Kolony
         RasterizerState rasterizerState;
         DepthStencilState depthStencilState;
         SpriteBatch spriteBatch;
-        SpriteBatch cubeTopSpriteBatch;
-        SpriteBatch cubeLeftSpriteBatch;
-        SpriteBatch cubeRightSpriteBatch;
         double seed;
         Font returnOfGanon;
         Font smallFonts;
@@ -52,6 +50,7 @@ namespace Kolony
         double memUsage = 0;
         TimeSpan elapsedTime = TimeSpan.Zero;
         Texture2D tileTexture;
+        Texture2D stoneCubeTexture;
         Sprite cursor;
         Border selectionBorder = new Border { Color = Col3.White };
         Col4 uiPanelColor = new Col4(80, 80, 80);
@@ -68,9 +67,6 @@ namespace Kolony
         Array2<float> densityField;
         bool drawUpdateTiles = false;
         bool applyTemperatureColor = false;
-        Matrix cubeTopTransform = Matrix.CreateRotationZ(0.78539816f) * Matrix.CreateScale(new Vector3(1.1f, .9f, 1f));
-        Matrix cubeLeftTransform = Matrix.CreateRotationZ(0.78539816f) * Matrix.CreateScale(new Vector3(.75f, 1.1f, 1f));
-        Matrix cubeRightTransform = Matrix.CreateRotationZ(-0.78539816f) * Matrix.CreateScale(new Vector3(.75f, 1f, 1f));
 
         public KolonyKernel()
         {
@@ -92,9 +88,6 @@ namespace Kolony
             Globals.GraphicsDevice = GraphicsDevice;
             GraphicsDevice.Viewport = new Viewport(0, 0, Globals.Width, Globals.Height); //This is needed for release builds to show the borderless window properly (otherwise it renders the top left chunk across the screen and the rest is out of bounds).
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            cubeTopSpriteBatch = new SpriteBatch(GraphicsDevice);
-            cubeLeftSpriteBatch = new SpriteBatch(GraphicsDevice);
-            cubeRightSpriteBatch = new SpriteBatch(GraphicsDevice);
             rasterizerState = new RasterizerState { CullMode = CullMode.CullClockwiseFace, FillMode = FillMode.Solid };
             depthStencilState = new DepthStencilState { DepthBufferEnable = true, DepthBufferFunction = CompareFunction.Less };
             XNA.Initialize2D(GraphicsDevice);
@@ -140,8 +133,7 @@ namespace Kolony
             //Material.Gas.Texture = gasTileTexture;
             //Material.Liquid.Texture = gasTileTexture;
             //Material.Permanent.Texture = geyserTexture;
-            Material.Stone.TopTexture = tileTexture;
-            Material.Stone.SideTexture = tileTexture;
+            Material.Stone.Texture = stoneCubeTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/greyCube.png");
             //Material.Vacuum.Texture = geyserTexture;
             //Material.Water.Texture = gasTileTexture;
             //Material.WaterIce.Texture = tileTexture;
@@ -155,45 +147,31 @@ namespace Kolony
             Console.Write("Done!");
             Console.WriteLine();
             Console.Write("Spawning Tiles..");
-            //for (int y = 0; y < worldTileHeight; y++)
-            //{
-            //    for (int x = 0; x < worldTileWidth; x++)
-            //    {
-            //        //double temperature = ((double)(temperatureField.Get(x, y) * 100)).Round();
-            //        //double density = Math.Exp(densityField.Get(x, y) / 2);
-            //        Cube tile = null;
-            //        //Tile gen logic by density would go here..
-            //        tile = new Cube()
-            //        {
-            //            Material = Material.Stone,
-            //            Visual = new SpriteGroup 
-            //            { 
-            //                new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize - (tileSize / 3)), Tint = Col3.White },
-            //                new Sprite(tileTexture) { Position = new Vec2(x * tileSize - (tileSize / 3), y * tileSize + (tileSize / 3)), Tint = Col3.Blue },
-            //                new Sprite(tileTexture) { Position = new Vec2(x * tileSize + (tileSize / 3), y * tileSize + (tileSize / 3)), Tint = Col3.Red },
-            //            },
-            //            Random = random,
-            //            Temperature = new TemperatureF(60),
-            //            Mass = ((double)(matterField.Get(x, y) * 1000)).Round(),
-            //        };
-            //        world.Put(x, y, tile);
-            //        Globals.AllGameObjects.Add(tile);
-            //    }
-            //}
-            int x = 10;
-            int y = 10;
-            Cube tile = new Cube()
+            for (int y = 0; y < worldTileHeight; y++)
             {
-                Material = Material.Stone,
-                TopSprite = new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.White },
-                LeftSprite = new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.Blue },
-                RightSprite = new Sprite(tileTexture) { Position = new Vec2(x * tileSize, y * tileSize), Tint = Col3.Red },
-                Random = random,
-                Temperature = new TemperatureF(60),
-                Mass = ((double)(matterField.Get(x, y) * 1000)).Round(),
-            };
-            world.Put(x, y, tile);
-            Globals.AllGameObjects.Add(tile);
+                for (int x = 0; x < worldTileWidth; x++)
+                {
+                    //double temperature = ((double)(temperatureField.Get(x, y) * 100)).Round();
+                    //double density = Math.Exp(densityField.Get(x, y) / 2);
+                    Cube cube = null;
+                    //Tile gen logic by density would go here..
+
+                    var pos = GridToWorld(new Vec2(x, y));
+                    var textureBounds = Material.Stone.Texture.Bounds;
+                    cube = new Cube()
+                    {
+                        Position = pos,
+                        Material = Material.Stone,
+                        Visual = new Sprite(Material.Stone.Texture) { Position = pos, Scale = new Vec2(2), Depth = ((float)y * (float)worldTileWidth + (float)x) / (float)worldTileCount },
+                        Random = random,
+                        Temperature = new TemperatureF(60),
+                        Mass = ((double)(matterField.Get(x, y) * 1000)).Round(),
+                        BoundingRect = new BoundingRect(pos, new Vec2(textureBounds.X * 2, textureBounds.Y * 2)),
+                    };
+                    world.Put(x, y, cube);
+                    Globals.AllGameObjects.Add(cube);
+                }
+            }
             Console.Write("Done!");
             Console.WriteLine();
             Console.Write("Launching Background Thread(s)...");
@@ -203,12 +181,24 @@ namespace Kolony
             base.LoadContent();
         }
 
+        public Vec2 GridToWorld(Vec2 position)
+        {
+            var xTileSize = position.X * tileSize;
+            var yTileSize = position.Y * tileSize;
+            var halfXTileSize = xTileSize / 2;
+            return new Vec2(xTileSize, yTileSize + halfXTileSize);
+        }
+
+        public Vec2 WorldToGrid(Vec2 position)
+        {
+            var x = position.X / tileSize;
+            var y = (position.Y - (position.X / 2)) / tileSize;
+            return new Vec2(x, y);
+        }
+
         protected override bool BeginDraw()
         {
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
-            cubeTopSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: cubeTopTransform);
-            cubeLeftSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: cubeLeftTransform);
-            cubeRightSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: cubeRightTransform);
             return base.BeginDraw();
         }
 
@@ -228,19 +218,9 @@ namespace Kolony
 
             var viewportBounds = new BoundingRect(viewportCursor - tileSize, viewportMax);
             foreach (var go2 in Globals.AllGameObjects)
-                if ((go2.Visual != null && go2.Visual.Position.Within(viewportBounds) || 
-                    (go2 is Cube cube && (cube.TopSprite.Position.Within(viewportBounds) || 
-                                         cube.LeftSprite.Position.Within(viewportBounds) || 
-                                         cube.RightSprite.Position.Within(viewportBounds)))))
+                if (go2.Visual != null)// && go2.Visual.Position.Within(viewportBounds)) //culling disableeedddd
                 {
-                    if (go2 is Cube c)
-                    {
-                        c.TopSprite.Draw(cubeTopSpriteBatch, viewportCursor);
-                        c.LeftSprite.Draw(cubeLeftSpriteBatch, viewportCursor);
-                        c.RightSprite.Draw(cubeRightSpriteBatch, viewportCursor);
-                    }
-                    else
-                        go2.Visual.Draw(spriteBatch, viewportCursor);
+                    go2.Visual.Draw(spriteBatch, viewportCursor);
                     objectsDrawn++;
                 }
 
@@ -268,13 +248,14 @@ namespace Kolony
                 Cube t = selection[0] as Cube;
                 if (t != null)
                 {
+                    var sprite = t.Visual as Sprite;
                     var tilePosition = t.Visual.Position / tileSize;
                     infoWindow.Text =
                         "Material: " + t.Material.Name + "\n" +
                         "Position: " + tilePosition + "\n" +
                         "Mass (Kg): " + t.Mass + "\n" +
                         "Temp (F): " + t.Temperature;
-                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), t.Visual.Position + (tileSize / 2) - viewportCursor, Col4.White, 3);
+                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), t.Visual.Position + (t.Visual.Size / 2) - viewportCursor, Col4.White, 3);
                     infoWindow.Draw(spriteBatch, Vec2.Zero);
                 }
             }
@@ -294,9 +275,6 @@ namespace Kolony
 
         protected override void EndDraw()
         {
-            cubeRightSpriteBatch.End();
-            cubeLeftSpriteBatch.End();
-            cubeTopSpriteBatch.End();
             spriteBatch.End();
             base.EndDraw();
         }
@@ -383,28 +361,34 @@ namespace Kolony
                 foreach (var gameObject in previousSelection)
                     if (gameObject.Visual.Children.Contains(selectionBorder))
                         gameObject.Visual.Children.Remove(selectionBorder);
-                Cube t = world.Get((cursor.Position.Xi + viewportCursor.Xi) / tileSize, (cursor.Position.Yi + viewportCursor.Yi) / tileSize);
-                if (t != null)
-                {
-                    if (t.SelectionEnabled)
-                    {
-                        t.Selected = true;
-                        selection.Add(t);
-                        t.Visual.Children.Add(selectionBorder);
-                        selectionBorder.Parent = t.Visual;
-                    }
-                }
-                //foreach (var gameObject in allGameObjects.Where(x => x.SelectionEnabled))
+                //var cursorPos = new Vec2(cursor.Position.Xi + viewportCursor.Xi, cursor.Position.Yi + viewportCursor.Yi);
+                //var cursorWorldPos = GridToWorld(cursorPos);
+                //MessageBox.Show("Cursor Info",
+                //    "Cursor Position: " + cursorPos + "\n" +
+                //    "Cursor World Position: " + cursorWorldPos, new string[] { "OK" });
+                //var worldPos = GridToWorld(cursorPos);
+                //Cube c = Globals.AllGameObjects.OfType<Cube>().Where(cube => cube.BoundingRect.Contains(cursorWorldPos)).FirstOrNull();
+                //if (c != null)
                 //{
-                //    if ((cursor.Position + viewportCursor).Within(gameObject.Visual.Position, gameObject.Visual.Position + gameObject.Visual.Size))
+                //    if (c.SelectionEnabled)
                 //    {
-                //        gameObject.Selected = true;
-                //        selection.Add(gameObject);
-                //        gameObject.Visual.Children.Add(selectionBorder);
-                //        selectionBorder.Parent = gameObject.Visual;
-                //        break; //We only allow one selection (at the moment - nothing breaks or anything).
+                //        c.Selected = true;
+                //        selection.Add(c);
+                //        c.Visual.Children.Add(selectionBorder);
+                //        selectionBorder.Parent = c.Visual;
                 //    }
                 //}
+                foreach (var gameObject in Globals.AllGameObjects.OfType<Cube>().Where(x => x.SelectionEnabled))
+                {
+                    if ((cursor.Position + viewportCursor).Within(gameObject.Visual.Position, gameObject.Visual.Position + gameObject.Visual.Size))
+                    {
+                        gameObject.Selected = true;
+                        selection.Add(gameObject);
+                        gameObject.Visual.Children.Add(selectionBorder);
+                        selectionBorder.Parent = gameObject.Visual;
+                        break; //We only allow one selection (at the moment - nothing breaks or anything).
+                    }
+                }
             }
             if (previousMouseState.RightButton == ButtonState.Released && activeMouseState.RightButton == ButtonState.Pressed) //Handle right mouse press when it was previously released (to respond only once to a click).
             {

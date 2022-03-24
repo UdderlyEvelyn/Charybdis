@@ -14,8 +14,7 @@ namespace Kolony
         public string Name;
         public float Density;
         public Col3 Color;
-        public Texture2D TopTexture;
-        public Texture2D SideTexture;
+        public Texture2D Texture;
 
         public static Material Stone = new Material
         {
