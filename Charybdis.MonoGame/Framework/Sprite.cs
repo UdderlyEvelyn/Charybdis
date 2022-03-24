@@ -23,7 +23,7 @@ namespace Charybdis.MonoGame
 
         public BoundingBox BoundingBox;
         
-        public float? Rotation;
+        public float Rotation = 0;
 
         public bool PositionBasedDepthEnabled = false;
 
@@ -32,6 +32,8 @@ namespace Charybdis.MonoGame
         public Vec2 Scale = Vec2.One;
 
         private Texture2D _data;
+
+        public Microsoft.Xna.Framework.Graphics.SpriteEffects Effects = Microsoft.Xna.Framework.Graphics.SpriteEffects.None;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float GetPositionBasedDepth(Vec2 offset)
@@ -42,27 +44,16 @@ namespace Charybdis.MonoGame
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, Vec2 offset)
         {
             if (!DrawMe)
-                return; //Set to not draw, so abort the drawing process.            
-            var pos = Position.ToXNA();
-            if (Rotation.HasValue)
-#pragma warning disable CS0618 // Type or member is obsolete
-                spriteBatch.Draw(_data,
-                    position: pos,
-                    color: Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White,
-                    rotation: Rotation.Value,
-                    scale: Scale.ToXNA(),
-                    origin: offset.ToXNA(),
-                    layerDepth: PositionBasedDepthEnabled ? GetPositionBasedDepth(offset) : Depth);
-#pragma warning restore CS0618 // Type or member is obsolete
-            else
-#pragma warning disable CS0618 // Type or member is obsolete
-                spriteBatch.Draw(_data,
-                    position: pos,
-                    color: Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White,
-                    scale: Scale.ToXNA(),
-                    origin: offset.ToXNA(),
-                    layerDepth: PositionBasedDepthEnabled ? GetPositionBasedDepth(offset) : Depth);
-#pragma warning restore CS0618 // Type or member is obsolete
+                return; //Set to not draw, so abort the drawing process.        
+            spriteBatch.Draw(_data,
+                position: Position.ToXNA(),
+                sourceRectangle: null,//new Microsoft.Xna.Framework.Rectangle(Position.Xi, Position.Yi, Size.Xi, Size.Yi),
+                color: Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White,
+                rotation: Rotation,
+                origin: offset.ToXNA(),
+                scale: Scale.ToXNA(),
+                effects: Effects,
+                layerDepth: PositionBasedDepthEnabled ? GetPositionBasedDepth(offset) : Depth);
             if (DrawChildren)
                 foreach (Drawable2 d2 in Children)
                     d2.Draw(spriteBatch, offset);

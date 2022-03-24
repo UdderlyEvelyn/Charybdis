@@ -512,7 +512,7 @@ namespace Charybdis.MonoGame
                     //Corrections trying to be universal but written for Consolas 12.
                     var xr = new XNARectangle(x - w, y + (int)((h / 1.4d).Round(places: 0)), w, h);
                     //No idea how rotation works, maybe radians, 30 is 90 degrees and 300 is -90 though I think.
-                    batch.Draw(font.Texture, destinationRectangle: xr, sourceRectangle: r.ToXNA(), color: color.ToXNA(), rotation: 30);
+                    batch.Draw(font.Texture, destinationRectangle: xr, sourceRectangle: r.ToXNA(), color: color.ToXNA(), rotation: 30, new Vector2(x + (w/2), y + (h/2)), Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
                     if (r.DestPadding.X == 0) //Old font type..
                         xAggregate += (int)(font.Spacing * r.H * font.Scale);
                     else

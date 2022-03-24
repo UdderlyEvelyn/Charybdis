@@ -18,4 +18,4 @@ namespace Charybdis.MonoGame
         public Drawable2 Parent;
         public bool DrawMe = true;
     }
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+}
