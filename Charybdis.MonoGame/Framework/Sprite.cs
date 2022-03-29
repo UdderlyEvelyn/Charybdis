@@ -33,6 +33,10 @@ namespace Charybdis.MonoGame
 
         private Texture2D _data;
 
+        public Col4 AlternateTint = Col4.Green;
+
+        public bool DrawAlternateTint = false;
+
         public Microsoft.Xna.Framework.Graphics.SpriteEffects Effects = Microsoft.Xna.Framework.Graphics.SpriteEffects.None;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -48,7 +52,7 @@ namespace Charybdis.MonoGame
             spriteBatch.Draw(_data,
                 position: Position.ToXNA(),
                 sourceRectangle: null,//new Microsoft.Xna.Framework.Rectangle(Position.Xi, Position.Yi, Size.Xi, Size.Yi),
-                color: Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White,
+                color: DrawAlternateTint ? AlternateTint.ToXNA() : (Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White),
                 rotation: Rotation,
                 origin: offset.ToXNA(),
                 scale: Scale.ToXNA(),

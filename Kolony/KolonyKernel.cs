@@ -67,6 +67,7 @@ namespace Kolony
         Array2<float> densityField;
         bool drawUpdateTiles = false;
         bool applyTemperatureColor = false;
+        Cube cubeAtCursor = null;
 
         public KolonyKernel()
         {
@@ -147,6 +148,7 @@ namespace Kolony
             Console.Write("Done!");
             Console.WriteLine();
             Console.Write("Spawning Tiles..");
+            //for (int i = 0; i < worldTileCount; i++)
             for (int y = 0; y < worldTileHeight; y++)
             {
                 for (int x = 0; x < worldTileWidth; x++)
@@ -245,30 +247,34 @@ namespace Kolony
             if (selection.Count > 0)
             {
                 infoWindow.Position = new Vec2(cursor.Position.X + cursor.Size.X + 3, cursor.Position.Y);
-                Cube t = selection[0] as Cube;
-                if (t != null)
+                Cube c = selection[0] as Cube;
+                if (c != null)
                 {
-                    var sprite = t.Visual as Sprite;
-                    var tilePosition = t.Visual.Position / tileSize;
                     infoWindow.Text =
-                        "Material: " + t.Material.Name + "\n" +
-                        "Position: " + tilePosition + "\n" +
-                        "Mass (Kg): " + t.Mass + "\n" +
-                        "Temp (F): " + t.Temperature;
-                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), t.Visual.Position + (t.Visual.Size / 2) - viewportCursor, Col4.White, 3);
+                        "Material: " + c.Material.Name + "\n" +
+                        "Position: " + c.Position + "(" + WorldToGrid(c.Position) + ")\n" +
+                        "Mass (Kg): " + c.Mass + "\n" +
+                        "Temp (F): " + c.Temperature;
+                    var scaledSize = c.Visual.Size * ((Sprite)c.Visual).Scale;
+                    //The Y/2 is cube-specific to point at center of top face.
+                    var lineTarget = c.Visual.Position + new Vec2(scaledSize.X, scaledSize.Y / 2) / 2;
+                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), lineTarget - viewportCursor, Col4.White, 3);
+                    //Below is what it was before adjusting for isometry or cubes.
+                    //spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), c.Visual.Position + (c.Visual.Size / 2) - viewportCursor, Col4.White, 3);
                     infoWindow.Draw(spriteBatch, Vec2.Zero);
                 }
             }
             spriteBatch.DrawSprite(cursor); //Draw cursor last so it's always on top.
             if (selection.Count == 0)
             {
-                int cursorTileX = (cursor.Position.Xi + viewportCursor.Xi) / tileSize;
-                int cursorTileY = (cursor.Position.Yi + viewportCursor.Yi) / tileSize;
-                if (!(cursorTileX > world.Width || cursorTileY > world.Height || cursorTileX < 0 || cursorTileY < 0))
+                var cursorTile = WorldToGrid(cursor.Position + viewportCursor);
+                if (!(cursorTile.X > world.Width || cursorTile.Y > world.Height || cursorTile.X < 0 || cursorTile.Y < 0))
                 {
-                    Cube t = world.Get(cursorTileX, cursorTileY);
-                    spriteBatch.DrawShadowedString(returnOfGanon, cursor.Position.ToString() + "\n" + cursorTileX + ", " + cursorTileY + (t != null ? "\n" + t.Temperature.ToString() : "") + "\n" + densityField.Get(cursorTileX, cursorTileY), new Vec2(cursor.Position.X, cursor.Position.Y + tileSize));
+                    cubeAtCursor = world.Get(cursorTile.Xi, cursorTile.Yi);
+                    spriteBatch.DrawShadowedString(returnOfGanon, cursor.Position.ToString() + "\n" + cursorTile.X + ", " + cursorTile.Y + (cubeAtCursor != null ? "\n" + cubeAtCursor.Temperature.ToString() : "") + "\n" + densityField.Get(cursorTile.Xi, cursorTile.Yi), new Vec2(cursor.Position.X, cursor.Position.Y + cursor.Size.Y));
                 }
+                else 
+                    cubeAtCursor = null;
             }
             base.Draw(gameTime);
         }
@@ -337,10 +343,10 @@ namespace Kolony
                     //            t.UpdateVisuals(); //Make sure we get a color so if temperatures don't change someplace we're not stuck.
                     //    }
                     //}
-                    Globals.AllGameObjectsLock.EnterReadLock();
-                    foreach (Creature c in Globals.AllGameObjects.OfType<Creature>())
-                        c.Update();
-                    Globals.AllGameObjectsLock.ExitReadLock();
+                    //Globals.AllGameObjectsLock.EnterReadLock();
+                    //foreach (Creature c in Globals.AllGameObjects.OfType<Creature>())
+                    //    c.Update();
+                    //Globals.AllGameObjectsLock.ExitReadLock();
                 }
             }
         }
@@ -355,12 +361,16 @@ namespace Kolony
             cursor.Position = new Vec2(activeMouseState.Position.X, activeMouseState.Position.Y);
             if (previousMouseState.LeftButton == ButtonState.Released && activeMouseState.LeftButton == ButtonState.Pressed) //Handle left mouse press when it was previously released (to respond only once to a click).
             {
-                previousSelection = selection;
+                foreach (var gameObject in selection)
+                {
+                    (gameObject.Visual as Sprite).DrawAlternateTint = false;
+                    gameObject.Selected = false;
+                }
                 selection.Clear();
-                selectionBorder.Parent = null;
-                foreach (var gameObject in previousSelection)
-                    if (gameObject.Visual.Children.Contains(selectionBorder))
-                        gameObject.Visual.Children.Remove(selectionBorder);
+                //selectionBorder.Parent = null;
+                //foreach (var gameObject in previousSelection)
+                //    if (gameObject.Visual.Children.Contains(selectionBorder))
+                //        gameObject.Visual.Children.Remove(selectionBorder);
                 //var cursorPos = new Vec2(cursor.Position.Xi + viewportCursor.Xi, cursor.Position.Yi + viewportCursor.Yi);
                 //var cursorWorldPos = GridToWorld(cursorPos);
                 //MessageBox.Show("Cursor Info",
@@ -378,26 +388,49 @@ namespace Kolony
                 //        selectionBorder.Parent = c.Visual;
                 //    }
                 //}
-                foreach (var gameObject in Globals.AllGameObjects.OfType<Cube>().Where(x => x.SelectionEnabled))
+                foreach (var c in Globals.AllGameObjects.OfType<Cube>().Where(x => x.SelectionEnabled))
                 {
-                    if ((cursor.Position + viewportCursor).Within(gameObject.Visual.Position, gameObject.Visual.Position + gameObject.Visual.Size))
+                    var sprite = (Sprite)c.Visual;
+                    var scaledSize = c.Visual.Size * sprite.Scale;
+                    //The Y/2 is cube-specific to point at top face instead of actual center.
+                    var cubeExtent = c.Visual.Position + new Vec2(scaledSize.X, scaledSize.Y / 2);
+                    if ((cursor.Position + viewportCursor).Within(c.Visual.Position, cubeExtent))
                     {
-                        gameObject.Selected = true;
-                        selection.Add(gameObject);
-                        gameObject.Visual.Children.Add(selectionBorder);
-                        selectionBorder.Parent = gameObject.Visual;
+                        c.Selected = true;
+                        sprite.DrawAlternateTint = true;
+                        selection.Add(c);
+                        //gameObject.Visual.Children.Add(selectionBorder);
+                        //selectionBorder.Parent = gameObject.Visual;
                         break; //We only allow one selection (at the moment - nothing breaks or anything).
                     }
                 }
             }
             if (previousMouseState.RightButton == ButtonState.Released && activeMouseState.RightButton == ButtonState.Pressed) //Handle right mouse press when it was previously released (to respond only once to a click).
             {
-                previousSelection = selection;
+                foreach (var gameObject in selection)
+                {
+                    gameObject.Selected = false;
+                    (gameObject.Visual as Sprite).DrawAlternateTint = false;
+                }   
                 selection.Clear();
-                foreach (var gameObject in previousSelection)
-                    if (gameObject.Visual.Children.Contains(selectionBorder))
-                        gameObject.Visual.Children.Remove(selectionBorder);
+                //foreach (var gameObject in previousSelection)
+                //    if (gameObject.Visual.Children.Contains(selectionBorder))
+                //        gameObject.Visual.Children.Remove(selectionBorder);
                 selectionBorder.Parent = null;
+            }
+            if (previousMouseState.MiddleButton == ButtonState.Released && activeMouseState.MiddleButton == ButtonState.Pressed) //Middle mouse button
+            {
+                if (selection.Count > 0)
+                {
+                    Cube c = (Cube)selection[0];
+                    MessageBox.Show("Cube Stats",
+                                    "Position: " + c.Position + "\n" +
+                                    "Visual Position: " + c.Visual.Position + "\n" +
+                                    "WorldToGrid Position: " + WorldToGrid(c.Position) + "\n" +
+                                    "WorldToGrid Visual.Position: " + WorldToGrid(c.Visual.Position)
+                                    , new string[] { "OK" });
+                }
+                else MessageBox.Show("Cube Stats", "No cube selected.", new string[] { "OK" });
             }
         }
 

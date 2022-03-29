@@ -103,7 +103,7 @@ namespace EvolutionSimulator
         
         public Creature Parent = null;
 
-        public const double ROTATION_COST_PER_STEP = .01; //.05 pre-1/12/19
+        public const double ROTATION_COST_PER_STEP = .025; //.05 pre-1/12/19 //.01 pre-3/24/22
         public const double MOVEMENT_COST_PER_STEP = .05; //.0005 pre-1/12/19
 
         private double _lastFoodNoticedThreshold = 0;
