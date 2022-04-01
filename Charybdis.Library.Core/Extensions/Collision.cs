@@ -187,8 +187,8 @@ namespace Charybdis.Library.Core
             // loop through all edges of the polygon
             for (int i = 0; i < vertices.Count - 1; i++)
             {    // edge from V[i]  to V[i+1]
-                if (((vertices[i].Yi <= point.Yi) && (vertices[i + 1].Yi > point.Yi))     // an upward crossing
-                 || ((vertices[i].Yi > point.Yi) && (vertices[i + 1].Yi <= point.Yi)))
+                if (((vertices[i].Y <= point.Y) && (vertices[i + 1].Y > point.Y))     // an upward crossing
+                 || ((vertices[i].Y > point.Y) && (vertices[i + 1].Y <= point.Y)))
                 { // a downward crossing
                   // compute  the actual edge-ray intersect x-coordinate
                     float vt = (point.Y - vertices[i].Y) / (vertices[i + 1].Y - vertices[i].Y);

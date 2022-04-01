@@ -186,10 +186,10 @@ namespace Kolony
                    "Right Face Bottom Right: " + RightFaceBottomRight + "\n";
         }
 
-        public bool WithinTopFace(Vec2 point)
-        {
-            return Collision2.PointInPolygon(point, TopFaceVertices);
-        }
+        //public bool WithinTopFace(Vec2 point)
+        //{
+        //    return Collision2.PointInPolygon(point, TopFaceVertices);
+        //}
 
         public bool WithinLeftFace(Vec2 point)
         {
@@ -206,15 +206,19 @@ namespace Kolony
             return Collision2.PointInPolygon(point, CubeBorderVertices);
         }
 
-        public bool WithinTopFace2(Vec2 point)
+        //This transforms the point into relative coordinate space of the bottom right triangle of the top face, and then lerps the Y value based on the X value between the possible X value range, and checks if the Y value falls in that valid range.
+        //This is cheaper than doing the traditional ray test, but it requires mirror symmetry on both X and Y axes.
+        public bool WithinTopFace(Vec2 point)
         {
-            var nPoint = TransformToTopFaceRelativeSpace(point);
-            return nPoint.Y <= Maths.Lerp(0, TopFaceCenter.Y - Y, nPoint.X / (TopFaceCenter.X - X));
+            var nPoint = TransformToTopFaceBottomRightQuadrantRelativeSpace(point);
+            return nPoint.Y <= Maths.Lerp(TopFaceCenter.Y - Y, 0, nPoint.X / (TopFaceCenter.X - X));
         }
 
-        public Vec2 TransformToTopFaceRelativeSpace(Vec2 point)
+        //This changes the coordinates to be relative to the center of the top face, and the Abs calls make it so that it doesn't differentiate between quadrants. Making each Abs result negative would make it be top left quadrant but that would be more expensive.
+        //The reason to do this is to effectively fold the coordinate space of the top face vertically and horizontally and only have to work with a single triangle.
+        public Vec2 TransformToTopFaceBottomRightQuadrantRelativeSpace(Vec2 point)
         {
-            return new Vec2(MathF.Abs(TopFaceCenter.X - point.X), MathF.Abs(TopFaceCenter.Y - point.Y));
+            return new Vec2(MathF.Abs(point.X - TopFaceCenter.X), MathF.Abs(point.Y - TopFaceCenter.Y));
         }
     }
 }

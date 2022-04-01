@@ -275,7 +275,7 @@ namespace Charybdis.Library.Core
 
         public static float Lerp(float min, float max, float percent)
         {
-            return min + ((max - min) * percent); //min * (1 - percent) + max * percent;
+            return min + ((max - min) * percent);
         }
     }
 }

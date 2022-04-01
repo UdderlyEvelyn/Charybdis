@@ -68,6 +68,9 @@ namespace Kolony
         bool drawUpdateTiles = false;
         bool applyTemperatureColor = false;
         Cube cubeAtCursor = null;
+        static Vec2 cubeScale = new Vec2(2);
+        static Vec2 halfCubeScale = cubeScale / 2;
+        static Vec2 cubeSize;
 
         public KolonyKernel()
         {
@@ -135,6 +138,7 @@ namespace Kolony
             //Material.Liquid.Texture = gasTileTexture;
             //Material.Permanent.Texture = geyserTexture;
             Material.Stone.Texture = stoneCubeTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/greyCube.png");
+            cubeSize = stoneCubeTexture.Bounds.Size.ToVector2().ToCharybdis();
             //Material.Vacuum.Texture = geyserTexture;
             //Material.Water.Texture = gasTileTexture;
             //Material.WaterIce.Texture = tileTexture;
@@ -160,7 +164,7 @@ namespace Kolony
 
                     var pos = GridToWorld(new Vec2(x, y));
                     var textureBounds = Material.Stone.Texture.Bounds;
-                    Sprite cubeSprite = new Sprite(Material.Stone.Texture) { Position = pos, Scale = new Vec2(2), Depth = ((float)y * (float)worldTileWidth + (float)x) / (float)worldTileCount };
+                    Sprite cubeSprite = new Sprite(Material.Stone.Texture) { Position = pos, Scale = cubeScale, Depth = ((float)y * (float)worldTileWidth + (float)x) / (float)worldTileCount };
                     cube = new Cube()
                     {
                         Position = pos,
@@ -170,8 +174,8 @@ namespace Kolony
                         Temperature = new TemperatureF(60),
                         Mass = ((double)(matterField.Get(x, y) * 1000)).Round(),
                         BoundingRect = new BoundingRect(pos, new Vec2(textureBounds.X * 2, textureBounds.Y * 2)),
+                        Coordinates = CubeCoordinates.Get(pos, cubeSize, cubeScale),
                     };
-                    cube.Coordinates = CubeCoordinates.Get(pos, cubeSprite.Size, cubeSprite.Scale);
                     world.Put(x, y, cube);
                     Globals.AllGameObjects.Add(cube);
                 }
@@ -187,16 +191,16 @@ namespace Kolony
 
         public Vec2 GridToWorld(Vec2 position)
         {
-            var xTileSize = position.X * tileSize;
-            var yTileSize = position.Y * tileSize;
+            var xTileSize = position.X * cubeSize.X * halfCubeScale.X;
+            var yTileSize = position.Y * cubeSize.Y * halfCubeScale.Y;
             var halfXTileSize = xTileSize / 2;
             return new Vec2(xTileSize, yTileSize + halfXTileSize);
         }
 
         public Vec2 WorldToGrid(Vec2 position)
         {
-            var x = position.X / tileSize;
-            var y = (position.Y - (position.X / 2)) / tileSize;
+            var x = position.X / (cubeSize.X * halfCubeScale.X);
+            var y = (position.Y - (position.X / 2)) / (cubeSize.Y * halfCubeScale.Y);
             return new Vec2(x, y);
         }
 
@@ -257,11 +261,14 @@ namespace Kolony
                         "Position: " + c.Position + "(" + WorldToGrid(c.Position) + ")\n" +
                         "Mass (Kg): " + c.Mass + "\n" +
                         "Temp (F): " + c.Temperature + "\n" +
-                        c.Coordinates;
+                        "Mouse In Top Face: " + c.Coordinates.WithinTopFace(cursor.Position) + "\n" +
+                        "Mouse In Left Face: " + c.Coordinates.WithinLeftFace(cursor.Position) + "\n" +
+                        "Mouse In Right Face: " + c.Coordinates.WithinRightFace(cursor.Position) + "\n" +
+                        "Mouse In Cube: " + c.Coordinates.WithinCube(cursor.Position);
                     //var scaledSize = c.Visual.Size * ((Sprite)c.Visual).Scale;
                     //The Y/2 is cube-specific to point at center of top face.
-                    var lineTarget = c.Coordinates.TopFaceCenter; //c.Visual.Position + new Vec2(scaledSize.X, scaledSize.Y / 2) / 2;
-                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), lineTarget - viewportCursor, Col4.White, 3);
+                    //var lineTarget = c.Visual.Position + new Vec2(scaledSize.X, scaledSize.Y / 2) / 2;
+                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), c.Coordinates.TopFaceCenter - viewportCursor, Col4.White, 3);
                     //Below is what it was before adjusting for isometry or cubes.
                     //spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), c.Visual.Position + (c.Visual.Size / 2) - viewportCursor, Col4.White, 3);
                     infoWindow.Draw(spriteBatch, Vec2.Zero);
@@ -421,23 +428,22 @@ namespace Kolony
                 //        gameObject.Visual.Children.Remove(selectionBorder);
                 selectionBorder.Parent = null;
             }
-            //if (previousMouseState.MiddleButton == ButtonState.Released && activeMouseState.MiddleButton == ButtonState.Pressed) //Middle mouse button
-            //{
-            //    if (selection.Count > 0)
-            //    {
-            //        Cube c = (Cube)selection[0];
-            //        MessageBox.Show("Cube Stats",
-            //                        "Position: " + c.Position + "\n" +
-            //                        "Visual Position: " + c.Visual.Position + "\n" +
-            //                        "WorldToGrid Position: " + WorldToGrid(c.Position) + "\n" +
-            //                        "WorldToGrid Visual.Position: " + WorldToGrid(c.Visual.Position) + "\n" +
+            if (previousMouseState.MiddleButton == ButtonState.Released && activeMouseState.MiddleButton == ButtonState.Pressed) //Middle mouse button
+            {
+                if (selection.Count > 0)
+                {
+                    Cube c = (Cube)selection[0];
+                    MessageBox.Show("Cube Stats",
+                                    "Position: " + c.Position + "\n" +
+                                    "Visual Position: " + c.Visual.Position + "\n" +
+                                    "WorldToGrid Position: " + WorldToGrid(c.Position) + "\n" +
+                                    "WorldToGrid Visual.Position: " + WorldToGrid(c.Visual.Position) + "\n" +
 
-            //            "Cursor In Top Face: " + c.Coordinates.WithinTopFace(cursor.Position) + "\n" +
-            //            "Cursor In Top Face 2: " + c.Coordinates.WithinTopFace2(cursor.Position)
-            //                        , new string[] { "OK" });
-            //    }
-            //    else MessageBox.Show("Cube Stats", "No cube selected.", new string[] { "OK" });
-            //}
+                        "Cursor In Top Face: " + c.Coordinates.WithinTopFace(cursor.Position)
+                                    , new string[] { "OK" });
+                }
+                else MessageBox.Show("Cube Stats", "No cube selected.", new string[] { "OK" });
+            }
         }
 
         public void KeyboardHandler(GameTime gameTime)
