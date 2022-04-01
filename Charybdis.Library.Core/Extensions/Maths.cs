@@ -272,5 +272,10 @@ namespace Charybdis.Library.Core
             //min + ((max - min) * sin(x / avg))
             return (float)(min + ((max - min) * Math.Sin(x / avg)));
         }
+
+        public static float Lerp(float min, float max, float percent)
+        {
+            return min + ((max - min) * percent); //min * (1 - percent) + max * percent;
+        }
     }
 }

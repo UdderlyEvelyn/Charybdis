@@ -42,8 +42,8 @@ namespace Charybdis.Science
 
         //http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/ (Original)
         //http://www.zombieprototypes.com/?p=210 (Corrected Fit Curve)
-        //Rewritten by Yushatak for efficiency/readability.
-        //Yushatak 10/3/18 - Refactored for multiple temperature scale support, added code to handle Fahrenheit.
+        //Rewritten by UdderlyEvelyn for efficiency/readability.
+        //UdderlyEvelyn 10/3/18 - Refactored for multiple temperature scale support, added code to handle Fahrenheit.
         /// <summary>
         /// Converts temperature in degrees Kelvin or Fahrenheit to an RGB Col3.
         /// </summary>

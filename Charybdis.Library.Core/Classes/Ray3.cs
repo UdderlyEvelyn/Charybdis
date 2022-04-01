@@ -7,7 +7,7 @@ using Charybdis.Library.Core;
 
 namespace Charybdis.Library.Core
 {
-    public class Ray : CharybdisObject, ICollisionObject3
+    public class Ray3 : CharybdisObject, ICollisionObject3
     {
         private Vec3 _position;
         private Vec3 _originalPosition;
@@ -64,7 +64,7 @@ namespace Charybdis.Library.Core
 
         public bool DrawMe { get; set; }
 
-        public Ray(Vec3 position, Vec3 direction)
+        public Ray3(Vec3 position, Vec3 direction)
         {
             Position = position;
             Direction = direction;

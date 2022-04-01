@@ -125,7 +125,7 @@ namespace Charybdis.Library.Core
             return inside; //Return
         }
 
-        // Converted for C# by Yushatak 2017
+        // Converted for C# by UdderlyEvelyn 2017
         // From http://geomalgorithms.com/a03-_inclusion.html
 
         // Copyright 2000 softSurfer, 2012 Dan Sunday
@@ -146,7 +146,7 @@ namespace Charybdis.Library.Core
         //            =0 for P2  on the line
         //            <0 for P2  right of the line
         //    See: Algorithm 1 "Area of Triangles and Polygons"
-        private static int isLeft(Vec2 P0, Vec2 P1, Vec2 P2)
+        public static int isLeft(Vec2 P0, Vec2 P1, Vec2 P2)
         {
             return ((P1.Xi - P0.Xi) * (P2.Yi - P0.Yi)
                     - (P2.Xi - P0.Xi) * (P1.Yi - P0.Yi));
@@ -159,7 +159,7 @@ namespace Charybdis.Library.Core
         //               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
         //      Return:  0 = outside, 1 = inside
         // This code is patterned after [Franklin, 2000]
-        private static int cn_PnPoly(Vec2 P, List<Vec2> V, int n)
+        public static int cn_PnPoly(Vec2 P, List<Vec2> V, int n)
         {
             int cn = 0;    // the  crossing number counter
 
@@ -180,12 +180,31 @@ namespace Charybdis.Library.Core
         }
         //===================================================================
 
+        public static bool PointInPolygon(Vec2 point, List<Vec2> vertices)
+        {
+            int cn = 0;    // the  crossing number counter
+
+            // loop through all edges of the polygon
+            for (int i = 0; i < vertices.Count - 1; i++)
+            {    // edge from V[i]  to V[i+1]
+                if (((vertices[i].Yi <= point.Yi) && (vertices[i + 1].Yi > point.Yi))     // an upward crossing
+                 || ((vertices[i].Yi > point.Yi) && (vertices[i + 1].Yi <= point.Yi)))
+                { // a downward crossing
+                  // compute  the actual edge-ray intersect x-coordinate
+                    float vt = (point.Y - vertices[i].Y) / (vertices[i + 1].Y - vertices[i].Y);
+                    if (point.X < vertices[i].X + vt * (vertices[i + 1].X - vertices[i].X)) // P.Xi < intersect
+                        ++cn;   // a valid crossing of y=P.Yi right of P.Xi
+                }
+            }
+            return (cn & 1) == 1;    // 0 if even (out), and 1 if  odd (in)
+        }
+
 
         // wn_PnPoly(): winding number test for a point in a polygon
         //      Input:   P = a point,
         //               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
         //      Return:  wn = the winding number (=0 only when P is outside)
-        private static int wn_PnPoly(Vec2 P, List<Vec2> V, int n)
+        public static int wn_PnPoly(Vec2 P, List<Vec2> V, int n)
         {
             int wn = 0;    // the  winding number counter
 
@@ -221,7 +240,7 @@ namespace Charybdis.Library.Core
         /// <param name="limit">maximum distance to take objects into account from</param>
         /// <param name="increment">the amount of distance along the ray to move between each check</param>
         /// <returns>the first ICollisionObject in the collision system that was encountered</returns>
-        public static ICollisionObject3 Cast(this Ray r, float limit, float increment = 1f)
+        public static ICollisionObject3 Cast(this Ray3 r, float limit, float increment = 1f)
         {
             IEnumerable<ICollisionObject3> cobjs = CollisionObjects.Where(co => co.Position.FastDistance(r.Position) < limit * limit); for (float f = 0; f < limit; f += increment)
             {
@@ -240,7 +259,7 @@ namespace Charybdis.Library.Core
         /// <param name="r">the ray to check</param>
         /// <param name="distance">the distance along the ray to check</param>
         /// <returns>the first ICollisionObject in the collision system that was encountered</returns>
-        public static ICollisionObject3 Offset(this Ray r, float distance)
+        public static ICollisionObject3 Offset(this Ray3 r, float distance)
         {
             try
             {

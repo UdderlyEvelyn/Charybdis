@@ -23,5 +23,7 @@ namespace Kolony
         {
             /*Nothing to see here.*/
         }
+
+        public CubeCoordinates Coordinates;
     }
 }
