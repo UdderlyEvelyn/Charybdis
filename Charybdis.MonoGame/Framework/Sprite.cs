@@ -50,11 +50,11 @@ namespace Charybdis.MonoGame
             if (!DrawMe)
                 return; //Set to not draw, so abort the drawing process.        
             spriteBatch.Draw(_data,
-                position: Position.ToXNA(),
+                position: (Position - offset).ToXNA(),
                 sourceRectangle: null,//new Microsoft.Xna.Framework.Rectangle(Position.Xi, Position.Yi, Size.Xi, Size.Yi),
                 color: DrawAlternateTint ? AlternateTint.ToXNA() : (Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White),
                 rotation: Rotation,
-                origin: offset.ToXNA(),
+                origin: (Size / 2).ToXNA(),
                 scale: Scale.ToXNA(),
                 effects: Effects,
                 layerDepth: PositionBasedDepthEnabled ? GetPositionBasedDepth(offset) : Depth);

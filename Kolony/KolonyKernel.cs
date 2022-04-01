@@ -25,9 +25,9 @@ namespace Kolony
         static int worldTileWidth = 320;
         static int worldTileHeight = 240;
         static int worldTileCount = worldTileWidth * worldTileHeight;
-        static int width = worldTileWidth * tileSize; 
-        static int height = worldTileHeight * tileSize;
-        static int size = width * height;
+        //static int width = worldTileWidth * tileSize; 
+        //static int height = worldTileHeight * tileSize;
+        //static int size = width * height;
         int viewportWidth = 1920;
         int viewportHeight = 1080;
         Vec2 viewportCursor = Vec2.Zero;
@@ -229,6 +229,7 @@ namespace Kolony
                 if (go2.Visual != null)// && go2.Visual.Position.Within(viewportBounds)) //culling disableeedddd
                 {
                     go2.Visual.Draw(spriteBatch, viewportCursor);
+                    //spriteBatch.DrawLine((go2 as Cube).Coordinates.TopFaceCenter - viewportCursor, cursor.Position, Col4.Red, 2);
                     objectsDrawn++;
                 }
 
@@ -366,8 +367,8 @@ namespace Kolony
             //Mouse Handling
             previousMouseState = activeMouseState;
             activeMouseState = Mouse.GetState();
-            if (activeMouseState.Position.X < 0 || activeMouseState.Position.Y < 0 || activeMouseState.Position.X > width || activeMouseState.Position.Y > height) //If mouse isn't in window..
-                return; //Don't handle mouse.
+            //if (activeMouseState.Position.X < 0 || activeMouseState.Position.Y < 0 || activeMouseState.Position.X > width || activeMouseState.Position.Y > height) //If mouse isn't in window..
+            //    return; //Don't handle mouse.
             cursor.Position = new Vec2(activeMouseState.Position.X, activeMouseState.Position.Y);
             if (previousMouseState.LeftButton == ButtonState.Released && activeMouseState.LeftButton == ButtonState.Pressed) //Handle left mouse press when it was previously released (to respond only once to a click).
             {
@@ -398,13 +399,16 @@ namespace Kolony
                 //        selectionBorder.Parent = c.Visual;
                 //    }
                 //}
+                //var cursorGridPosition = WorldToGrid(cursor.Position + viewportCursor);
+                //var c = world.Get(cursorGridPosition.Xi, cursorGridPosition.Yi);
                 foreach (var c in Globals.AllGameObjects.OfType<Cube>().Where(x => x.SelectionEnabled))
                 {
                     //var sprite = (Sprite)c.Visual;
                     //var scaledSize = c.Visual.Size * sprite.Scale;
                     //The Y/2 is cube-specific to point at top face instead of actual center.
                     //var cubeExtent = c.Visual.Position + new Vec2(scaledSize.X, scaledSize.Y / 2);
-                    if (c.Coordinates.WithinTopFace(cursor.Position + viewportCursor))
+                    //if ((cursor.Position + viewportCursor).Within(c.Visual.Position, cubeExtent))
+                    if (c.Coordinates.WithinTopFace(cursor.Position - viewportCursor))
                     {
                         c.Selected = true;
                         ((Sprite)c.Visual).DrawAlternateTint = true;
@@ -463,22 +467,22 @@ namespace Kolony
             var uRight = ks.IsKeyUp(Keys.Right);
             if (dDown && !dUp)
             {
-                if (viewportCursor.Y + viewportHeight < height)
+                //if (viewportCursor.Y + viewportHeight < height)
                     viewportCursor.Y += viewportSpeedY;
             }
             if (dUp && !dDown)
             {
-                if (viewportCursor.Y > 0)
+                //if (viewportCursor.Y > 0)
                     viewportCursor.Y -= viewportSpeedY;
             }
             if (dRight && !dLeft)
             {
-                if (viewportCursor.X + viewportWidth < width)
+                //if (viewportCursor.X + viewportWidth < width)
                     viewportCursor.X += viewportSpeedX;
             }
             if (dLeft && !dRight)
             {
-                if (viewportCursor.X > 0)
+                //if (viewportCursor.X > 0)
                     viewportCursor.X -= viewportSpeedX;
             }
             if (ks.IsKeyDown(Keys.Space) && previousKeyboardState != null && previousKeyboardState.IsKeyUp(Keys.Space))
