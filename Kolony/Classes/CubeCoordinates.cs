@@ -129,8 +129,8 @@ namespace Kolony
         /// <param name="precalculatedOffsets"></param>
         public CubeCoordinates(Vec2 position, CubeCoordinates precalculatedOffsets)
         {
-            X = position.X;
-            Y = position.Y;
+            X = precalculatedOffsets.X + position.X;
+            Y = precalculatedOffsets.Y + position.Y;
             W = precalculatedOffsets.W;
             H = precalculatedOffsets.H;
             Center = precalculatedOffsets.Center + position;
@@ -192,7 +192,7 @@ namespace Kolony
                    "Right Face Center: " + RightFaceCenter;
         }
 
-        public bool WithinTopFace(Vec2 point)
+        public bool WithinTopFaceAlt(Vec2 point)
         {
             return Collision2.PointInPolygon(point, TopFaceVertices);
         }
@@ -215,9 +215,9 @@ namespace Kolony
         //This does the same thing TransformToTopFaceBottomRightQuadrantRelativeSpace does built in,
         //and then lerps the Y value based on the X value between the possible X value range, and checks if the Y value falls in that valid range.
         //This is cheaper than doing the traditional ray test, but it requires mirror symmetry on both X and Y axes - works for the top face.
-        public bool WithinTopFaceAlt(Vec2 point)
+        public bool WithinTopFace(Vec2 point)
         {
-            return MathF.Abs(point.Y - TopFaceCenter.Y) <= Maths.Lerp(TopFaceCenter.Y - Y, 0, MathF.Abs(point.X - TopFaceCenter.X) / (TopFaceCenter.X - X));
+            return MathF.Abs(point.Y - TopFaceCenter.Y) <= Maths.Lerp(TopFaceCenter.Y - TopFaceTop.Y, 0, MathF.Abs(point.X - TopFaceCenter.X) / (TopFaceRight.X - TopFaceCenter.X));
         }
 
         //This changes the coordinates to be relative to the center of the top face, and the Abs calls make it so that it doesn't differentiate between quadrants. Making each Abs result negative would make it be top left quadrant but that would be more expensive.
