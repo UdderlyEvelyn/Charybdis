@@ -163,18 +163,18 @@ namespace Charybdis.MonoGame
             sprite.Draw(spriteBatch, Vec2.Zero);
         }
 
-        public static void DrawLine(this SpriteBatch spriteBatch, Vec2 origin, Vec2 destination, Col4 color, float thickness = 1)
+        public static void DrawLine(this SpriteBatch spriteBatch, Vec2 origin, Vec2 destination, Col4 color, float thickness = 1, float depth = 0)
         {
             Vector2 o = origin.ToXNA();
             Vector2 d = destination.ToXNA();
             float distance = Vector2.Distance(o, d);
             float angle = (float)Math.Atan2(d.Y - o.Y, d.X - o.X);
-            spriteBatch.DrawLine(o, distance, angle, thickness, color);
+            spriteBatch.DrawLine(o, distance, angle, thickness, color, depth);
         }
         
-        private static void DrawLine(this SpriteBatch spriteBatch, Vector2 origin, float length, float angle, float thickness, Col4 c)
+        private static void DrawLine(this SpriteBatch spriteBatch, Vector2 origin, float length, float angle, float thickness, Col4 c, float depth = 0)
         {
-            spriteBatch.Draw(WhiteTexture, origin, null, c.ToXNA(), angle, Vector2.Zero, new Vector2(length, thickness), SpriteEffects.None, 0);
+            spriteBatch.Draw(WhiteTexture, origin, null, c.ToXNA(), angle, Vector2.Zero, new Vector2(length, thickness), SpriteEffects.None, depth);
         }
 
         public static void FillRectangle(this SpriteBatch spriteBatch, Rect r, Col4 c)

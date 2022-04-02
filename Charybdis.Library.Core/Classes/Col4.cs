@@ -39,6 +39,7 @@ namespace Charybdis.Library.Core
         public static readonly Col4 Blue = Col3.Blue;
         public static readonly Col4 Green = Col3.Green;
         public static readonly Col4 Black = Col3.Black;
+        public static readonly Col4 Purple = new Col4(255/2, 0, 255/2, 255);
 
         public override string ToString()
         {
