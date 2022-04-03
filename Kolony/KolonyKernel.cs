@@ -23,9 +23,9 @@ namespace Kolony
         static int secondsPerDay = minutesPerDay * 60;
         static int tileSize = 32;
         //static int tileHalfSize = tileSize / 2;
-        static int worldWidth = 16;
-        static int worldHeight = 16;
-        static int worldDepth = 5;
+        static int worldWidth = 24;
+        static int worldHeight = 24;
+        static int worldDepth = 20;
         static int worldCountPerLayer = worldWidth * worldHeight;
         static int worldCount = worldCountPerLayer * worldDepth;
         //static int width = worldTileWidth * tileSize; 
@@ -52,8 +52,6 @@ namespace Kolony
         int frameCounter = 0;
         double memUsage = 0;
         TimeSpan elapsedTime = TimeSpan.Zero;
-        //Texture2D tileTexture;
-        Texture2D stoneCubeTexture;
         Sprite cursor;
         //Border selectionBorder = new Border { Color = Col3.White };
         Col4 uiPanelColor = new Col4(80, 80, 80);
@@ -68,6 +66,7 @@ namespace Kolony
         bool paused = false;
         DateTime? pauseTime = null;
         Array2<float> heightmap;
+        Array3<float> densityField;
         bool drawUpdateTiles = false;
         bool applyTemperatureColor = false;
         //Cube cubeAtCursor = null;
@@ -115,45 +114,61 @@ namespace Kolony
             Array2<float> matterField = new Array2<float>(worldWidth, worldHeight, 0).NormalizedNoise(seed + 2, Noise.DefaultNoiseArgs);
             Console.Write("Done!");
             Console.WriteLine();
+            Console.Write("Generating Heightmap..");
+            heightmap = new Array2<float>(worldWidth, worldHeight, 4).NormalizedNoise(seed + 3, new Noise.NoiseArgs(cornerContribution: .46f));
             Console.Write("Generating Density Field..");
-            heightmap = new Array2<float>(worldWidth, worldHeight, 0).NormalizedNoise(seed + 3, Noise.DefaultNoiseArgs);
-            //densityField = new Array2<float>(worldWidth, worldHeight, 0).NormalizedNoise(seed + 3, Noise.DefaultNoiseArgs);
-            world = new Array3<Cube>(worldWidth, worldHeight, worldDepth);
+            densityField = new Array3<float>(worldWidth, worldHeight, worldDepth).NormalizedNoise(Noise.DefaultNoiseArgs);
             Console.Write("Done!");
             Console.WriteLine();
+            world = new Array3<Cube>(worldWidth, worldHeight, worldDepth);
+            Console.WriteLine();
             Console.Write("Setting Up Textures From \"" + Content.RootDirectory + "/Textures\"..");
-            Material.Stone.Texture = stoneCubeTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/greyCube.png");
-            cubeSize = stoneCubeTexture.Bounds.Size.ToVector2().ToCharybdis();
+            Material.Stone.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeStone.png");
+            Material.Soil.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeSoil.png");
+            Material.Sand.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeSand.png");
+            Material.Grey.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeGrey.png");
+            Material.Air.Texture = Material.Grey.Texture;
+            cubeSize = Material.Grey.Texture.Bounds.Size.ToVector2().ToCharybdis();
             Console.Write("Done!");
             Console.WriteLine();
             Console.Write("Spawning Cubes..");
-            //for (int i = 0; i < worldTileCount; i++)
             for (int y = 0; y < worldHeight; y++)
             {
                 for (int x = 0; x < worldWidth; x++)
                 {
                     for (int z = 0; z < worldDepth; z++)
                     {
+                        float layer = (float)worldDepth - 1 - (float)z; //0 is lowest, flip for sensible number..
                         //double temperature = ((double)(temperatureField.Get(x, y) * 100)).Round();
-                        //double density = Math.Exp(densityField.Get(x, y) / 2);
+                        float density = densityField.Get(x, y, z) * (z * .5f); //Get density and adjust it so that lower cubes are more dense on average (for now, simple way to make things sensible).
                         Cube cube = null;
                         //Tile gen logic by density would go here..
 
                         var pos = GridToWorld(new Vec2(x, y), z);
                         var textureBounds = Material.Stone.Texture.Bounds;
-                        var sprite = new Sprite(Material.Stone.Texture, pos, cubeScale);
-                        //,
-                        //(((((float)y * (float)worldWidth + (float)x)) / (float)worldCountPerLayer)));// * .9f)
-                        //    + 
-                        //    (((float)z / (float)worldDepth)) * .1f);
-                        //float maxHeightAtXY = heightmap.Get(x, y) * (float)worldDepth;
-                        int depthColor = (int)((((float)worldDepth - (float)z) / (float)worldDepth) * 255f);
+
+                        Material material = Material.Air;
+
+                        bool invalidHeight = false;
+                        if (layer <= (float)heightmap.Get(x, y) * (float)worldDepth) //If this position has enough height to exist..
+                            material = density switch
+                            {
+                                _ when density < Material.Soil.Density => Material.Sand,
+                                _ when density < Material.Stone.Density => Material.Soil,
+                                _ when density < Material.Grey.Density => Material.Stone,
+                                _ => Material.Grey,
+                            };
+                        else
+                            invalidHeight = true;
+                        var sprite = new Sprite(material.Texture, pos, cubeScale);
+                        int depthColor = (int)(layer / (float)worldDepth * 255f);
                         sprite.Tint = new Col4(depthColor, depthColor, depthColor);
                         cube = new Cube()
                         {
-                            Depth = worldDepth - z,
+                            TMP_Density = density,
+                            Depth = layer,
                             Position = pos,
-                            Material = Material.Stone,
+                            Material = material,
                             Visual = sprite,
                             Random = random,
                             Temperature = new TemperatureF(60),
@@ -163,9 +178,9 @@ namespace Kolony
                         };
                         world.Set(x, y, z, cube);
                         Globals.AllGameObjects.Add(cube);
-                        if (worldDepth - z > heightmap.Get(x, y) * worldDepth) //If this position doesn't have enough height..
+                        if (invalidHeight)
                         {
-                            sprite.Tint = new Col4(255, 255, 255,0); //Invisible.
+                            sprite.Tint = Col4.Invisible;
                             cube.SelectionEnabled = false; //Unselectable.
                         }
                     }
@@ -279,6 +294,7 @@ namespace Kolony
                         "Sprite Depth: " + sprite.Depth + "\n" +
                         "Sprite Tint: " + sprite.Tint + "\n" +
                         "Mass (Kg): " + c.Mass + "\n" +
+                        "TMP_Density: " + c.TMP_Density + "\n" +
                         "Temp (F): " + c.Temperature;// + "\n\n" +
 
                         //"Mouse In Top Face: " + c.Coordinates.WithinTopFace(worldCursorPosition) + " (alt " + c.Coordinates.WithinTopFaceAlt(worldCursorPosition) + ")\n" +

@@ -13,14 +13,23 @@ namespace Kolony
     {
         public string Name;
         public float Density;
-        public Col3 Color;
         public Texture2D Texture;
 
-        public static Material Stone = new Material
+        public Material(string name, float density, Texture2D texture = null)
         {
-            Density = 4,
-            Color = Col3.White,
-            Name = "Stone",
-        };
+            Name = name;
+            Density = density;
+            Texture = texture;
+        }
+
+        public static Material Air = new Material("Air", 0);
+
+        public static Material Stone = new Material("Stone", 4);
+
+        public static Material Soil = new Material("Soil", 2);
+
+        public static Material Sand = new Material("Sand", 1);
+
+        public static Material Grey = new Material("Grey", 999);
     }
 }

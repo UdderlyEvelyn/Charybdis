@@ -13,6 +13,9 @@ namespace Charybdis.Library.Core
     {
         public Array3(int width, int height, int depth)
         {
+            layers = depth;
+            numRows = height;
+            rowWidth = width;
             for (int z = 0; z < depth; z++)
                 Add(new Array2<T>(width, height));
         }
@@ -35,6 +38,41 @@ namespace Charybdis.Library.Core
         public void Set(Vec3 coordinates, T value)
         {
             this[coordinates.Zi].Set(coordinates.Xi, coordinates.Yi, value);
+        }
+
+        protected int rowWidth;
+        public int Width
+        {
+            get
+            {
+                return rowWidth;
+            }
+        }
+
+        protected int numRows;
+        public int Height
+        {
+            get
+            {
+                return numRows;
+            }
+        }
+
+        protected int layers;
+        public int Depth
+        {
+            get
+            {
+                return layers;
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                return rowWidth * numRows * layers;
+            }
         }
     }
 }

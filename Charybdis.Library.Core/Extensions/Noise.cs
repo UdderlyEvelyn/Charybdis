@@ -39,6 +39,21 @@ namespace Charybdis.Library.Core
             return data;
         }
 
+        //public static void Perlin(this Array2<float> data, int octaves = 11, float maxValue = 1)
+        //{
+        //    Array2<float> perlin = GeneratePerlinNoise(data.Width, data.Height, octaves);
+        //    for (int i = 0; i < data.Count; i++)
+        //        data.Set(i, perlin.Get(i) * maxValue);
+        //}
+
+        //public static void Perlin(this Array2<float> data, int xOffset, int yOffset, int octaves = 11)
+        //{
+        //    Array2<float> baseNoise = new Array2<float>(data.Width, data.Height).RawSimplexNoise(xOffset, yOffset, 0, octaves);
+        //    Array2<float> perlin = GeneratePerlinNoise(baseNoise, octaves / 2);
+        //    for (int i = 0; i < data.Count; i++)
+        //        data.Set(i, perlin.Get(i));
+        //}
+
         public static Array2<byte> Perlin(this Array2<byte> data, int octaves = 11, byte maxValue = 255)
         {
             Array2<float> perlin = GeneratePerlinNoise(data.Width, data.Height, octaves);
@@ -517,6 +532,20 @@ namespace Charybdis.Library.Core
             return sum / (float)Math.Pow(na.octaves, na.sumExponent);
         }
 
+        public static float GetOctaveNoise(double x, double y, double z, NoiseArgs na)
+        {
+            float sum = 0;
+            float curWeight = 1f;
+            for (int i = 0; i < na.octaves; i++)
+            {
+                float exp = 1 << i;
+                float div = (float)Math.Pow(.5f, i);
+                sum += curWeight * GetNoise(x * exp, y * exp, z * exp, na.persistance, na.cornerContribution);
+                curWeight *= na.octavePersistance;
+            }
+            return sum / (float)Math.Pow(na.octaves, na.sumExponent);
+        }
+
         /*public static Array2<float> tStaticNoise(this Array2<float> data)
         {
             for (int i = 0; i < data.Count; i++)
@@ -541,6 +570,26 @@ namespace Charybdis.Library.Core
             }
             return data;
         }*/
+
+        public static Array3<float> NormalizedNoise(this Array3<float> data, NoiseArgs na, int xOffset = 0, int yOffset = 0, int projectedWidth = 0, int projectedHeight = 0)
+        {
+            int radiusX = data.Width / 2;
+            int radiusY = data.Height / 2;
+            if (projectedWidth > 0 && projectedHeight > 0)
+            {
+                radiusX = projectedWidth / 2;
+                radiusY = projectedHeight / 2;
+            }
+            for (int z = 0; z < data.Depth; z++)
+                for (int y = 0; y < data.Height; y++)
+                    for (int x = 0; x < data.Width; x++)
+                    {
+                        float nx = (x + xOffset - radiusX) / (float)radiusX;
+                        float ny = (y + yOffset - radiusY) / (float)radiusY;
+                        data.Set(x, y, z, GetOctaveNoise(nx, ny, z, na));
+                    }
+            return data;
+        }
 
         public static Array2<float> NormalizedNoise(this Array2<float> data, double seed, NoiseArgs na, int xOffset = 0, int yOffset = 0, int projectedWidth = 0, int projectedHeight = 0)
         {
