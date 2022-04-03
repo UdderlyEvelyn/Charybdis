@@ -17,6 +17,16 @@ namespace Kolony
             SelectionEnabled = true;
         }
 
+        public Vec3 WorldPosition
+        {
+            get
+            {
+                return new Vec3(Position, Depth);
+            }
+        }
+
+        public float Depth;
+
         public Material Material;
 
         public override void Update()

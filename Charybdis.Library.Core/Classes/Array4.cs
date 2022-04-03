@@ -6,16 +6,17 @@ using System.Text;
 namespace Charybdis.Library.Core
 {
     /// <summary>
+    /// This is a lie, it uses an Array2 of Array2s.
     /// Emulates a 4D array (2D array of 2D arrays) using a 1D array for efficiency/speed while providing the usability of a 4D array's logic.
     /// </summary>
-    public class Array4<dataType>
+    public class Array4<T>
     {
         public int rowWidth = 1;
         public int numRows = 1;
         public int cellWidth = 1;
         public int cellRows = 1;
-        public Array2<Array2<dataType>>[] array;
-        public dataType defaultValue;
+        public Array2<Array2<T>>[] array;
+        public T defaultValue;
         public int Count
         {
             get
@@ -23,14 +24,14 @@ namespace Charybdis.Library.Core
                 return rowWidth * numRows;
             }
         }
-        public int itemCount
+        public int ItemCount
         {
             get
             {
                 return (rowWidth * cellWidth) * (numRows * cellRows);
             }
         }
-        public int cellSize
+        public int CellSize
         {
             get
             {
@@ -46,7 +47,7 @@ namespace Charybdis.Library.Core
         /// <param name="cellRows">Virtual number of rows in each cell (nested 2D array).</param>
         /// <param name="cellWidth">Virtual number of values in each cell (nested 2D array) row.</param>
         /// <param name="defaultValue">The value each item will be initialized with.</param>
-        public Array4(int rowWidth, int numRows, int cellWidth, int cellRows, dataType defaultValue)
+        public Array4(int rowWidth, int numRows, int cellWidth, int cellRows, T defaultValue)
         {
             //Move our parameters into the classwide variables.
             this.rowWidth = rowWidth;
@@ -54,34 +55,34 @@ namespace Charybdis.Library.Core
             this.cellRows = cellRows;
             this.cellWidth = cellWidth;
             this.defaultValue = defaultValue;
-            this.array = new Array2<Array2<dataType>>[rowWidth * numRows];
+            this.array = new Array2<Array2<T>>[rowWidth * numRows];
         }
 
-        public Array2<dataType> getCell(int x, int y)
+        public Array2<T> GetCell(int x, int y)
         {
             //Return the value with the offset calculated based on our virtual array.
-            return array[x + (y * rowWidth)] as Array2<dataType>;
+            return array[x + (y * rowWidth)] as Array2<T>;
         }
 
-        public Array2<dataType> getCell(int i)
+        public Array2<T> GetCell(int i)
         {
-            return array[i] as Array2<dataType>;
+            return array[i] as Array2<T>;
         }
 
-        public dataType get(int x, int y, int cx, int cy)
+        public T Get(int x, int y, int cx, int cy)
         {
-            return getCell(x, y).Get(cx, cy);
+            return GetCell(x, y).Get(cx, cy);
         }
 
-        public void put(int x, int y, int cx, int cy, dataType value)
+        public void Set(int x, int y, int cx, int cy, T value)
         {
             //Place the value using the offset calculated based on our virtual array.
-            getCell(x, y).Put(cx, cy, value);
+            GetCell(x, y).Set(cx, cy, value);
         }
 
-        public void putCell(int x, int y, Array2<dataType> c)
+        public void SetCell(int x, int y, Array2<T> c)
         {
-            Array2<dataType> cell = getCell(x, y);
+            Array2<T> cell = GetCell(x, y);
             if (cell.Width == c.Width && cell.Height == c.Height)
             {
                 cell.SetArray(c.Array);
@@ -89,16 +90,16 @@ namespace Charybdis.Library.Core
             else throw new ArgumentOutOfRangeException("c");
         }
 
-        public void clear()
+        public void Clear()
         {
             for (int i = 0; i < array.Count(); i++)
             {
-                Array2<dataType> cell = getCell(i);
+                Array2<T> cell = GetCell(i);
                 cell.Fill(defaultValue);
             }
         }
 
-        public void fill(dataType value, int xMin = 0, int xMax = 0, int yMin = 0, int yMax = 0)
+        public void Fill(T value, int xMin = 0, int xMax = 0, int yMin = 0, int yMax = 0)
         {
             if (xMax == 0) xMax = rowWidth;
             if (yMax == 0) yMax = numRows;
@@ -106,7 +107,7 @@ namespace Charybdis.Library.Core
             {
                 for (int x = xMin; x <= xMax; x++)
                 {
-                    putCell(x, y, new Array2<dataType>(cellWidth, cellRows, value));
+                    SetCell(x, y, new Array2<T>(cellWidth, cellRows, value));
                 }
             }
         }

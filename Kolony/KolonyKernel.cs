@@ -23,9 +23,11 @@ namespace Kolony
         static int secondsPerDay = minutesPerDay * 60;
         static int tileSize = 32;
         //static int tileHalfSize = tileSize / 2;
-        static int worldTileWidth = 16;
-        static int worldTileHeight = 16;
-        static int worldTileCount = worldTileWidth * worldTileHeight;
+        static int worldWidth = 16;
+        static int worldHeight = 16;
+        static int worldDepth = 5;
+        static int worldCountPerLayer = worldWidth * worldHeight;
+        static int worldCount = worldCountPerLayer * worldDepth;
         //static int width = worldTileWidth * tileSize; 
         //static int height = worldTileHeight * tileSize;
         //static int size = width * height;
@@ -53,19 +55,19 @@ namespace Kolony
         //Texture2D tileTexture;
         Texture2D stoneCubeTexture;
         Sprite cursor;
-        Border selectionBorder = new Border { Color = Col3.White };
+        //Border selectionBorder = new Border { Color = Col3.White };
         Col4 uiPanelColor = new Col4(80, 80, 80);
         Col4 uiBorderColor = Col4.White;
         TextWindow infoWindow;
         List<KolonyObject> selection = new List<KolonyObject>();
-        List<KolonyObject> previousSelection = new List<KolonyObject>();
-        Array2<Cube> world;
+        //List<KolonyObject> previousSelection = new List<KolonyObject>();
+        Array3<Cube> world;
         DateTime lastUpdate = DateTime.Now;
         double lastSecondsSinceLastUpdate = 0;
         long updateCount = 0;
         bool paused = false;
         DateTime? pauseTime = null;
-        Array2<float> densityField;
+        Array2<float> heightmap;
         bool drawUpdateTiles = false;
         bool applyTemperatureColor = false;
         //Cube cubeAtCursor = null;
@@ -109,76 +111,64 @@ namespace Kolony
             var cursorTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/Cursor21.png");
             cursor = new Sprite(cursorTexture); //, PredefinedBoundingRect = new BoundingRect(Vec2.Zero, 3), BoundingOffset = new Vec2(-1, -1) };
             infoWindow = new TextWindow("", returnOfGanon, uiBorderColor, uiPanelColor, Col4.White);
-            //infoWindow.Parent = cursor;
-            //cursor.Children.Add(infoWindow);
-
-            SurroundingTiles.TileSize = tileSize;
-            SurroundingTiles.WorldTileWidth = worldTileWidth;
-            SurroundingTiles.WorldTileHeight = worldTileHeight;
-
-            //Console.Write("Generating Temperature Field..");
-            //Array2<float> temperatureField = new Array2<float>(worldTileWidth, worldTileHeight,0).NormalizedNoise(seed, Noise.DefaultNoiseArgs);
-            //Console.Write("Done!");
-            //Console.WriteLine();
             Console.Write("Generating Matter Field..");
-            Array2<float> matterField = new Array2<float>(worldTileWidth, worldTileHeight, 0).NormalizedNoise(seed + 2, Noise.DefaultNoiseArgs);
+            Array2<float> matterField = new Array2<float>(worldWidth, worldHeight, 0).NormalizedNoise(seed + 2, Noise.DefaultNoiseArgs);
             Console.Write("Done!");
             Console.WriteLine();
             Console.Write("Generating Density Field..");
-            densityField = new Array2<float>(worldTileWidth, worldTileHeight, 0).NormalizedNoise(seed + 3, Noise.DefaultNoiseArgs);
-            world = new Array2<Cube>(worldTileWidth, worldTileHeight);
+            heightmap = new Array2<float>(worldWidth, worldHeight, 0).NormalizedNoise(seed + 3, Noise.DefaultNoiseArgs);
+            //densityField = new Array2<float>(worldWidth, worldHeight, 0).NormalizedNoise(seed + 3, Noise.DefaultNoiseArgs);
+            world = new Array3<Cube>(worldWidth, worldHeight, worldDepth);
             Console.Write("Done!");
             Console.WriteLine();
             Console.Write("Setting Up Textures From \"" + Content.RootDirectory + "/Textures\"..");
-            //tileTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/Tile32.png");
-            //gasTileTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/GasTile32.png");
-            //geyserTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/Geyser32.png");
-            //Scroble.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/Scroble.png");
-            //xSprite = new Sprite(GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/X32.png"));
-            //Material.Gas.Texture = gasTileTexture;
-            //Material.Liquid.Texture = gasTileTexture;
-            //Material.Permanent.Texture = geyserTexture;
             Material.Stone.Texture = stoneCubeTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/greyCube.png");
             cubeSize = stoneCubeTexture.Bounds.Size.ToVector2().ToCharybdis();
-            //Material.Vacuum.Texture = geyserTexture;
-            //Material.Water.Texture = gasTileTexture;
-            //Material.WaterIce.Texture = tileTexture;
-            //Material.Steam.Texture = gasTileTexture;
-            //Material.Dioxygen.Texture = gasTileTexture;
-            //Material.Hydrogen.Texture = gasTileTexture;
-            //Material.LiquidHydrogen.Texture = gasTileTexture;
-            //Material.LiquidOxygen.Texture = gasTileTexture;
-            //Material.SolidHydrogen.Texture = tileTexture;
-            //Material.SolidOxygen.Texture = tileTexture;
             Console.Write("Done!");
             Console.WriteLine();
-            Console.Write("Spawning Tiles..");
+            Console.Write("Spawning Cubes..");
             //for (int i = 0; i < worldTileCount; i++)
-            for (int y = 0; y < worldTileHeight; y++)
+            for (int y = 0; y < worldHeight; y++)
             {
-                for (int x = 0; x < worldTileWidth; x++)
+                for (int x = 0; x < worldWidth; x++)
                 {
-                    //double temperature = ((double)(temperatureField.Get(x, y) * 100)).Round();
-                    //double density = Math.Exp(densityField.Get(x, y) / 2);
-                    Cube cube = null;
-                    //Tile gen logic by density would go here..
-
-                    var pos = GridToWorld(new Vec2(x, y));
-                    var textureBounds = Material.Stone.Texture.Bounds;
-                    var sprite = new Sprite(Material.Stone.Texture, pos, cubeScale, ((float)y * (float)worldTileWidth + (float)x) / (float)worldTileCount);
-                    cube = new Cube()
+                    for (int z = 0; z < worldDepth; z++)
                     {
-                        Position = pos,
-                        Material = Material.Stone,
-                        Visual = sprite,
-                        Random = random,
-                        Temperature = new TemperatureF(60),
-                        Mass = ((double)(matterField.Get(x, y) * 1000)).Round(),
-                        //BoundingRect = new BoundingRect(pos, new Vec2(textureBounds.X * 2, textureBounds.Y * 2)),
-                        Coordinates = CubeCoordinates.Get(pos, cubeSize, cubeScale, sprite.Origin),
-                    };
-                    world.Put(x, y, cube);
-                    Globals.AllGameObjects.Add(cube);
+                        //double temperature = ((double)(temperatureField.Get(x, y) * 100)).Round();
+                        //double density = Math.Exp(densityField.Get(x, y) / 2);
+                        Cube cube = null;
+                        //Tile gen logic by density would go here..
+
+                        var pos = GridToWorld(new Vec2(x, y), z);
+                        var textureBounds = Material.Stone.Texture.Bounds;
+                        var sprite = new Sprite(Material.Stone.Texture, pos, cubeScale);
+                        //,
+                        //(((((float)y * (float)worldWidth + (float)x)) / (float)worldCountPerLayer)));// * .9f)
+                        //    + 
+                        //    (((float)z / (float)worldDepth)) * .1f);
+                        //float maxHeightAtXY = heightmap.Get(x, y) * (float)worldDepth;
+                        int depthColor = (int)((((float)worldDepth - (float)z) / (float)worldDepth) * 255f);
+                        sprite.Tint = new Col4(depthColor, depthColor, depthColor);
+                        cube = new Cube()
+                        {
+                            Depth = worldDepth - z,
+                            Position = pos,
+                            Material = Material.Stone,
+                            Visual = sprite,
+                            Random = random,
+                            Temperature = new TemperatureF(60),
+                            Mass = ((double)(matterField.Get(x, y) * 1000)).Round(),
+                            //BoundingRect = new BoundingRect(pos, new Vec2(textureBounds.X * 2, textureBounds.Y * 2)),
+                            Coordinates = CubeCoordinates.Get(pos, cubeSize, cubeScale, sprite.Origin),
+                        };
+                        world.Set(x, y, z, cube);
+                        Globals.AllGameObjects.Add(cube);
+                        if (worldDepth - z > heightmap.Get(x, y) * worldDepth) //If this position doesn't have enough height..
+                        {
+                            sprite.Tint = new Col4(255, 255, 255,0); //Invisible.
+                            cube.SelectionEnabled = false; //Unselectable.
+                        }
+                    }
                 }
             }
             Console.Write("Done!");
@@ -190,12 +180,14 @@ namespace Kolony
             base.LoadContent();
         }
 
-        public Vec2 GridToWorld(Vec2 position)
+        public Vec2 GridToWorld(Vec2 position, float z)
         {
-            var xTileSize = position.X * cubeSize.X * halfCubeScale.X;
-            var yTileSize = position.Y * cubeSize.Y * halfCubeScale.Y;
-            var halfXTileSize = xTileSize / 2;
-            return new Vec2(xTileSize, yTileSize + halfXTileSize);
+            var x = position.X * cubeSize.X * halfCubeScale.X;
+            var y = position.Y * cubeSize.Y * halfCubeScale.Y;
+            var halfSizeY = cubeSize.Y * cubeScale.Y / 2;
+            var halfSizeX = cubeSize.X * cubeScale.X / 2;
+            //var halfSizeY = cubeSize.Y * halfCubeScale.Y / 2;
+            return new Vec2(x, y + (x/2) + (halfSizeY * z));
         }
 
         public Vec2 WorldToGrid(Vec2 position)
@@ -207,7 +199,7 @@ namespace Kolony
 
         protected override bool BeginDraw()
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);//, DepthStencilState.Default);
             return base.BeginDraw();
         }
 
@@ -223,15 +215,26 @@ namespace Kolony
             int objectsDrawn = 0;
             Vec2 viewportMax = new Vec2(viewportCursor.X + viewportWidth, viewportCursor.Y + viewportHeight);
 
-            Globals.VisualsLock.EnterReadLock();
+            //Globals.VisualsLock.EnterReadLock();
 
             //var viewportBounds = new BoundingRect(viewportCursor - tileSize, viewportMax);
-            foreach (var go2 in Globals.AllGameObjects)
-                if (go2.Visual != null && go2.Visual.Position.Within(viewportCursor, viewportMax))
-                {
-                    go2.Visual.Draw(spriteBatch, viewportCursor);
-                    objectsDrawn++;
-                }
+            for (int y = 0; y < worldHeight; y++)
+                for (int x = 0; x < worldWidth; x++)
+                    for (int z = worldDepth - 1; z >= 0; z--)
+                    {
+                        var c = world.Get(x, y, z);
+                        if (c.Visual.Position.Within(viewportCursor, viewportMax))
+                        {
+                            c.Visual.Draw(spriteBatch, viewportCursor);
+                            objectsDrawn++;
+                        }
+                    }
+            //foreach (var go2 in Globals.AllGameObjects)
+            //    if (go2.Visual != null && go2.Visual.Position.Within(viewportCursor, viewportMax))
+            //    {
+            //        go2.Visual.Draw(spriteBatch, viewportCursor);
+            //        objectsDrawn++;
+            //    }
             if (cubeCoordinateDebug)
                 foreach (var go2 in Globals.AllGameObjects)
                     if (go2.Visual != null && go2.Visual.Position.Within(viewportCursor, viewportMax))
@@ -243,11 +246,11 @@ namespace Kolony
                         spriteBatch.DrawLine(cube.Coordinates.RightFaceCenter - viewportCursor, cursor.Position, Col4.Red, 2, 1);
                     }
 
-            Globals.VisualsLock.ExitReadLock();
+            //Globals.VisualsLock.ExitReadLock();
             
             spriteBatch.DrawShadowedString(returnOfGanon,
                 "Charybdis2D Kernel - " + frameRate + "FPS - " + memUsage + "MB" + "\n" +
-                "World Size: " + worldTileWidth + "x" + worldTileHeight + "\n" +
+                "World Size: " + worldWidth + "x" + worldHeight + "\n" +
                 "Viewport Cursor: " + viewportCursor.ToString() + "\n" +
                 "Viewport Max: " + viewportMax.ToString() + "\n" +
                 "Local Cursor: " + cursor.Position.ToString() + "\n" +
@@ -267,19 +270,23 @@ namespace Kolony
                 Cube c = selection[0] as Cube;
                 if (c != null)
                 {
+                    var sprite = (Sprite)c.Visual;
                     var worldCursorPosition = cursor.Position + viewportCursor;
                     infoWindow.Text =
                         "Material: " + c.Material.Name + "\n" +
-                        "Position: " + c.Position + "(" + WorldToGrid(c.Position) + ")\n" +
+                        "Position: " + c.Position + "\n" +
+                        "World Position: " + c.WorldPosition + "\n" +
+                        "Sprite Depth: " + sprite.Depth + "\n" +
+                        "Sprite Tint: " + sprite.Tint + "\n" +
                         "Mass (Kg): " + c.Mass + "\n" +
-                        "Temp (F): " + c.Temperature + "\n\n" +
+                        "Temp (F): " + c.Temperature;// + "\n\n" +
 
-                        "Mouse In Top Face: " + c.Coordinates.WithinTopFace(worldCursorPosition) + " (alt " + c.Coordinates.WithinTopFaceAlt(worldCursorPosition) + ")\n" +
-                        "Mouse In Left Face: " + c.Coordinates.WithinLeftFace(worldCursorPosition) + "\n" +
-                        "Mouse In Right Face: " + c.Coordinates.WithinRightFace(worldCursorPosition) + "\n" +
-                        "Mouse In Cube: " + c.Coordinates.WithinCube(worldCursorPosition) + "\n\n" +
+                        //"Mouse In Top Face: " + c.Coordinates.WithinTopFace(worldCursorPosition) + " (alt " + c.Coordinates.WithinTopFaceAlt(worldCursorPosition) + ")\n" +
+                        //"Mouse In Left Face: " + c.Coordinates.WithinLeftFace(worldCursorPosition) + "\n" +
+                        //"Mouse In Right Face: " + c.Coordinates.WithinRightFace(worldCursorPosition) + "\n" +
+                        //"Mouse In Cube: " + c.Coordinates.WithinCube(worldCursorPosition) + "\n\n" +
 
-                        c.Coordinates;
+                        //c.Coordinates;
 
                     //var scaledSize = c.Visual.Size * ((Sprite)c.Visual).Scale;
                     //The Y/2 is cube-specific to point at center of top face.
@@ -416,7 +423,7 @@ namespace Kolony
                 //}
                 //var cursorGridPosition = WorldToGrid(cursor.Position + viewportCursor);
                 //var c = world.Get(cursorGridPosition.Xi, cursorGridPosition.Yi);
-                foreach (var c in Globals.AllGameObjects.OfType<Cube>().Where(x => x.SelectionEnabled))
+                foreach (var c in Globals.AllGameObjects.OfType<Cube>().Where(x => x.SelectionEnabled).OrderByDescending(x => x.Depth))
                 {
                     //var sprite = (Sprite)c.Visual;
                     //var scaledSize = c.Visual.Size * sprite.Scale;

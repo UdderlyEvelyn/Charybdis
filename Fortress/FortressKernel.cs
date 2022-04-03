@@ -242,7 +242,7 @@ namespace Fortress
                             };
                         }
                     }
-                    world.Put(x, y, tile);
+                    world.Set(x, y, tile);
                     Globals.AllGameObjects.Add(tile);
                     Globals.Visuals.Add(tile.Visual);
                     i++;
@@ -702,8 +702,8 @@ namespace Fortress
                                     bool bcGasOrLiquid = st.BottomCenter != null ? st.BottomCenter.Material.Phase == Material.MaterialPhase.Gas || st.BottomCenter.Material.Phase == Material.MaterialPhase.Liquid : false;
                                     if (tcGasOrLiquid && (t.Material.Density < st.TopCenter.Material.Density || (t.Material.Density == st.TopCenter.Material.Density && t.Temperature.Value > st.TopCenter.Temperature.Value))) //T heavier or equal density but hotter than TC (move T up)
                                     {
-                                        world.Put(x, y, st.TopCenter);
-                                        world.Put(x, y - 1, t);
+                                        world.Set(x, y, st.TopCenter);
+                                        world.Set(x, y - 1, t);
                                         var oldTilePos = t.Visual.Position;
                                         t.Visual.Position = st.TopCenter.Visual.Position;
                                         st.TopCenter.Visual.Position = oldTilePos;
@@ -712,8 +712,8 @@ namespace Fortress
                                     }
                                     else if (bcGasOrLiquid && (t.Material.Density > st.BottomCenter.Material.Density || (t.Material.Density == st.BottomCenter.Material.Density && t.Temperature.Value < st.BottomCenter.Temperature.Value))) //BC lighter or equal density but hotter than T (move BC up)
                                     {
-                                        world.Put(x, y, st.BottomCenter);
-                                        world.Put(x, y + 1, t);
+                                        world.Set(x, y, st.BottomCenter);
+                                        world.Set(x, y + 1, t);
                                         var oldTilePos = t.Visual.Position;
                                         t.Visual.Position = st.BottomCenter.Visual.Position;
                                         st.BottomCenter.Visual.Position = oldTilePos;
@@ -727,8 +727,8 @@ namespace Fortress
                                         if ((lGasOrLiquid && !rGasOrLiquid) || (lGasOrLiquid && random.Chance(.5))) //If left is the only option or a 50% chance.
                                         {
                                             //Swap with tile to the left.
-                                            world.Put(x, y, st.Left);
-                                            world.Put(x - 1, y, t);
+                                            world.Set(x, y, st.Left);
+                                            world.Set(x - 1, y, t);
                                             var oldTilePos = t.Visual.Position;
                                             t.Visual.Position = st.Left.Visual.Position;
                                             st.Left.Visual.Position = oldTilePos;
@@ -738,8 +738,8 @@ namespace Fortress
                                         else if (rGasOrLiquid) //If right is an option.
                                         {
                                             //Swap with tile to the right.
-                                            world.Put(x, y, st.Right);
-                                            world.Put(x + 1, y, t);
+                                            world.Set(x, y, st.Right);
+                                            world.Set(x + 1, y, t);
                                             var oldTilePos = t.Visual.Position;
                                             t.Visual.Position = st.Right.Visual.Position;
                                             st.Right.Visual.Position = oldTilePos;
@@ -886,7 +886,7 @@ namespace Fortress
                     {
                         var pos = t.Visual.Position;
                         Tile n = new GeyserTile { Temperature = new TemperatureF(400), Visual = new Sprite(geyserTexture) { Position = pos }, Random = t.Random, Mass = t.Mass };
-                        world.Put((int)(pos.X / tileSize), (int)(pos.Y / tileSize), n);
+                        world.Set((int)(pos.X / tileSize), (int)(pos.Y / tileSize), n);
                         Globals.AllGameObjectsLock.EnterWriteLock();
                         Globals.AllGameObjects.Remove(t);
                         Globals.AllGameObjects.Add(n);
@@ -910,7 +910,7 @@ namespace Fortress
                     {
                         var pos = t.Visual.Position;
                         Tile n = new VacuumTile { Visual = new Sprite(geyserTexture) { Position = pos }, Random = t.Random, Mass = 0 };
-                        world.Put((int)(pos.X / tileSize), (int)(pos.Y / tileSize), n);
+                        world.Set((int)(pos.X / tileSize), (int)(pos.Y / tileSize), n);
                         Globals.AllGameObjectsLock.EnterWriteLock();
                         Globals.AllGameObjects.Remove(t);
                         Globals.AllGameObjects.Add(n);

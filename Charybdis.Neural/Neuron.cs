@@ -36,7 +36,7 @@ namespace Charybdis.Neural
             Function = function;
             Inputs = new double[inputCount];
             Bias = bias ?? new MutableDouble(null, Globals.StartingBiasMutability);
-            network.Neurons.Put(layer, depth, this);
+            network.Neurons.Set(layer, depth, this);
         }
 
         public void Update(ulong updateNumber)

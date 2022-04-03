@@ -6,27 +6,11 @@ using System.Threading.Tasks;
 
 namespace Charybdis.Library.Core
 {
-    public class ClassArray2<T> : Array2<T>
-        where T : class
+    public class ClassArray2<T> : Array2<T> where T : class
     {
         public override T Get(int x, int y)
         {
-            try
-            {
-                return array[rowWidth * y + x];
-            }
-            catch (Exception) //Totally shouldn't be doing this. :D
-            {
-                return null;
-            }
-            //catch (IndexOutOfRangeException)
-            //{
-            //    return null;
-            //}
-            //catch (ArgumentOutOfRangeException)
-            //{
-            //    return null;
-            //}
+            return array[rowWidth * y + x];
         }
 
         public ClassArray2(int width, int height) : base(width, height)
@@ -185,24 +169,24 @@ namespace Charybdis.Library.Core
             return array[i];
         }
 
-        public void Put(int x, int y, T value)
-        {
-            Set(x, y, value);
-        }
-
         public void Set(int x, int y, T value)
         {
              array[rowWidth * y + x] = value;
         }
 
-        public void Put(int i, T value)
-        {
-            Set(i, value);
-        }
-
         public void Set(int i, T value)
         {
             array[i] = value;
+        }
+
+        public T Get(Vec2 coordinates)
+        {
+            return array[rowWidth * coordinates.Yi + coordinates.Xi];
+        }
+
+        public void Set(Vec2 coordinates, T value)
+        {
+            array[rowWidth * coordinates.Yi + coordinates.Xi] = value;
         }
 
         public T Largest

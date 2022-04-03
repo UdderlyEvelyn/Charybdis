@@ -171,7 +171,7 @@ namespace EvolutionSimulator
                             Globals.AllGameObjects.Add(at);
                         }
                     //}
-                    Globals.World.Put(x, y, t);
+                    Globals.World.Set(x, y, t);
                     Globals.Tiles.Add(t);
                     Globals.Visuals.Add(t.Visual);
                 }

@@ -69,7 +69,7 @@
 //                {
 //                    if (IsVacant(x)) //0 is the default "nothing is here" ID.
 //                    {
-//                        _layout.Put(x, i.ID);
+//                        _layout.Set(x, i.ID);
 //                        if (_items.ContainsKey(i)) _items[i]++;
 //                        else _items.Add(i, 1);
 //                        return true; //Found a slot.

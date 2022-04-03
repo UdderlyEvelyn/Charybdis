@@ -64,7 +64,7 @@ namespace Charybdis.Neural
         //        foreach (var sn in neuronList)
         //        {
         //            var neuron = sn.ToNeuron(n, ActivationFunction);
-        //            n.Neurons.Put(sn.layer, sn.depth, neuron);
+        //            n.Neurons.Set(sn.layer, sn.depth, neuron);
         //            neuronIDTranslationTable.Add(sn.id, neuron.ID);
         //        }
         //        for (int x = 0; x < Width; x++)
@@ -80,7 +80,7 @@ namespace Charybdis.Neural
         //                    n.SynapseBucket.Add(synapse);
         //                    synapses.Add(synapse);
         //                }
-        //                n.Synapses.Put(x, y, synapses);
+        //                n.Synapses.Set(x, y, synapses);
         //            }
         //        }
         //        return n;
@@ -253,18 +253,18 @@ namespace Charybdis.Neural
                     for (int y = 0; y < InputCount; y++)
                     {
                         //DateTime startDepth = DateTime.Now;
-                        Neurons.Put(x, 0, new Neuron(this, x, y, null, 1));
+                        Neurons.Set(x, 0, new Neuron(this, x, y, null, 1));
                         //networkCreationLog += "Depth " + y + " [" + (DateTime.Now - startDepth).TotalMilliseconds + "ms]\n";
                     }
                 else if (x == Width - 1) //Output layer..
                     for (int y = 0; y < OutputCount; y++)
                     {
                         List<Synapse> depthIndices = new List<Synapse>();
-                        Synapses.Put(x, y, depthIndices);
+                        Synapses.Set(x, y, depthIndices);
                         //DateTime startDepth = DateTime.Now;
                         var parentNeuron = parent.Neurons.Get(x, y);
                         var thisNeuron = new Neuron(this, x, y, null, Height, parentNeuron.Bias.GetCopy());
-                        Neurons.Put(x, y, thisNeuron);
+                        Neurons.Set(x, y, thisNeuron);
                         for (int i = 0; i < Height; i++)
                         {
 
@@ -289,11 +289,11 @@ namespace Charybdis.Neural
                     for (int y = 0; y < Height; y++)
                     {
                         List<Synapse> depthIndices = new List<Synapse>();
-                        Synapses.Put(x, y, depthIndices);
+                        Synapses.Set(x, y, depthIndices);
                         //DateTime startDepth = DateTime.Now;
                         var parentNeuron = parent.Neurons.Get(x, y);
                         var thisNeuron = new Neuron(this, x, y, parent.ActivationFunction, Height, parentNeuron.Bias.GetCopy());
-                        Neurons.Put(x, y, thisNeuron);
+                        Neurons.Set(x, y, thisNeuron);
                         for (int i = 0; i < Height; i++)
                         {
                             //DateTime startIndex = DateTime.Now;
@@ -333,13 +333,13 @@ namespace Charybdis.Neural
                 List<List<Synapse>> layerDepths = new List<List<Synapse>>();
                 if (x == 0) //Input layer..
                     for (int y = 0; y < InputCount; y++)
-                        Neurons.Put(x, y, new Neuron(this, x, y, null, 1));
+                        Neurons.Set(x, y, new Neuron(this, x, y, null, 1));
                 else if (x == width - 1) //Output layer..
                     for (int y = 0; y < OutputCount; y++)
                     {
                         List<Synapse> depthIndices = new List<Synapse>();
-                        Synapses.Put(x, y, depthIndices);
-                        Neurons.Put(x, y, new Neuron(this, x, y, null, height));
+                        Synapses.Set(x, y, depthIndices);
+                        Neurons.Set(x, y, new Neuron(this, x, y, null, height));
                         for (int i = 0; i < height; i++)
                             if (synapticConnectionChance < 1 ? Globals.Random.Chance(synapticConnectionChance) : true)
                             {
@@ -352,8 +352,8 @@ namespace Charybdis.Neural
                     for (int y = 0; y < height; y++)
                     {
                         List<Synapse> depthIndices = new List<Synapse>();
-                        Synapses.Put(x, y, depthIndices);
-                        Neurons.Put(x, y, new Neuron(this, x, y, activationFunction, height));
+                        Synapses.Set(x, y, depthIndices);
+                        Neurons.Set(x, y, new Neuron(this, x, y, activationFunction, height));
                         for (int i = 0; i < (x == 1 ? InputCount : height); i++)
                             if (synapticConnectionChance < 1 ? Globals.Random.Chance(synapticConnectionChance) : true)
                             {

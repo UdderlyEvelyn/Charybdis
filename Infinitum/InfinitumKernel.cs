@@ -172,7 +172,7 @@ namespace Infinitum
                             Temperature = new TemperatureF(temperature),
                             Mass = ((double)(matterField.Get(x, y) * 1000)).Round(),
                         };
-                        world.Put(x, y, tile);
+                        world.Set(x, y, tile);
                         Globals.AllGameObjects.Add(tile);
                         Globals.Visuals.Add(tile.Visual);
                     }
