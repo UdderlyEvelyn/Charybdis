@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Charybdis.Library.Core;
 using Microsoft.Xna.Framework.Graphics;
 using System.Reflection;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {

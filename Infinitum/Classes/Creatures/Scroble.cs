@@ -7,6 +7,8 @@ using Charybdis.Library.Core;
 using Microsoft.Xna.Framework.Graphics;
 using Charybdis.Science;
 using Charybdis.MonoGame;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Infinitum
 {
@@ -57,7 +59,7 @@ namespace Infinitum
             if (Calories <= HungryCalories) //If Hungry..
             {
                 (Visual as Sprite).Tint = Col3.Red; //Tint Red, Show Hunger.
-                TileInteraction(World.Get(Visual.Position.Xi / 32, Visual.Position.Yi / 32));
+                TileInteraction(World.Get((int)(Visual.Position.X / 32), (int)(Visual.Position.Y / 32)));
             }
             else
             {

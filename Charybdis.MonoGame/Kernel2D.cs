@@ -14,6 +14,8 @@ using Charybdis.Science;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {
@@ -87,8 +89,8 @@ namespace Charybdis.MonoGame
             font2.Scale = .5f;
             var cursorTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/Cursor21.png");
             cursor = new Sprite(cursorTexture);
-            infoWindow = new TextWindow("", font1, uiBorderColor, uiPanelColor, Col4.White) { Parent = cursor, Position = cursor.Size * 1.1 };
-            infoWindow.DrawMe = false; //Temporary, trying to figure out why it won't stop drawing when a check for .Text being null is put in place. -YK 1/25/19
+            infoWindow = new TextWindow("", font1, uiBorderColor, uiPanelColor, Col4.White) { Parent = cursor, Position = cursor.Size * new Vec2(1.1f) };
+            infoWindow.DrawMe = false; //Temporary, trying to figure out why it won't stop drawing when a check for .Text being null is put in place. -UdderlyEvelyn 1/25/19
             cursor.Children.Add(infoWindow);
 
             #endregion
@@ -186,7 +188,6 @@ namespace Charybdis.MonoGame
             previousMouseState = activeMouseState;
             activeMouseState = Mouse.GetState();
             cursor.Position = new Vec2(activeMouseState.Position.X, activeMouseState.Position.Y);
-            var mousePosition = new Vector3(activeMouseState.Position.X, activeMouseState.Position.Y, 0);
             if (previousMouseState.LeftButton == ButtonState.Released && activeMouseState.LeftButton == ButtonState.Pressed) //Handle left mouse press when it was previously released (to respond only once to a click).
             {
                 //Left Click

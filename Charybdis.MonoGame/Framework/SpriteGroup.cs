@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {

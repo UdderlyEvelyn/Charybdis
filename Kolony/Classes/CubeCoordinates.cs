@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Charybdis.MonoGame;
 using Charybdis.Library.Core;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Kolony
 {
@@ -194,22 +196,22 @@ namespace Kolony
 
         public bool WithinTopFaceAlt(Vec2 point)
         {
-            return Collision2.PointInPolygon(point, TopFaceVertices);
+            return Collision.PointInPolygon(point, TopFaceVertices);
         }
 
         public bool WithinLeftFace(Vec2 point)
         {
-            return Collision2.PointInPolygon(point, LeftFaceVertices);
+            return Collision.PointInPolygon(point, LeftFaceVertices);
         }
 
         public bool WithinRightFace(Vec2 point)
         {
-            return Collision2.PointInPolygon(point, RightFaceVertices);
+            return Collision.PointInPolygon(point, RightFaceVertices);
         }
 
         public bool WithinCube(Vec2 point)
         {
-            return Collision2.PointInPolygon(point, CubeBorderVertices);
+            return Collision.PointInPolygon(point, CubeBorderVertices);
         }
 
         //This does the same thing TransformToTopFaceBottomRightQuadrantRelativeSpace does built in,

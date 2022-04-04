@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Charybdis.Library.Core;
 using Microsoft.Xna.Framework.Graphics;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {
@@ -26,7 +28,7 @@ namespace Charybdis.MonoGame
         public OutlinedCircle(float radius)
         {
             Radius = radius;
-            DirectionalBiasFunction = angle => Maths.CirclePointAtAngle(Radius.Value, angle);
+            DirectionalBiasFunction = angle => Maths.CirclePointAtAngle(Radius.Value, angle).ToXNA();
             _fillCircle = new Circle(radius - .5f);
         }
 

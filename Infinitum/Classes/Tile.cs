@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Charybdis.Library.Core;
 using Charybdis.Science;
 using Charybdis.MonoGame;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Infinitum
 {

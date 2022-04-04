@@ -12,6 +12,8 @@ using System.Diagnostics;
 using Charybdis.Library.Core;
 using Charybdis.Science;
 using Charybdis.MonoGame;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Infinitum
 {
@@ -208,7 +210,7 @@ namespace Infinitum
             Globals.VisualsLock.EnterReadLock();
 
             foreach (var d2 in Globals.Visuals)
-                if (d2.Position.Within(viewportCursor - tileSize, viewportMax))
+                if (d2.Position.Within(viewportCursor - new Vec2(tileSize), viewportMax))
                 {
                     d2.Draw(spriteBatch, viewportCursor);
                     objectsDrawn++;
@@ -246,15 +248,15 @@ namespace Infinitum
                         "Mass (Kg): " + t.Mass + "\n" +
                         "Temp (F): " + t.Temperature + "\n" +
                         "Tint: " + (t.Visual as Sprite).Tint.ToString();
-                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), t.Visual.Position + (tileSize / 2) - viewportCursor, Col4.White, 3);
+                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), t.Visual.Position + new Vec2(tileSize / 2) - viewportCursor, Col4.White, 3);
                     infoWindow.Draw(spriteBatch, Vec2.Zero);
                 }
             }
             spriteBatch.DrawSprite(cursor); //Draw cursor last so it's always on top.
             if (selection.Count == 0)
             {
-                int cursorTileX = (cursor.Position.Xi + viewportCursor.Xi) / tileSize;
-                int cursorTileY = (cursor.Position.Yi + viewportCursor.Yi) / tileSize;
+                int cursorTileX = (int)((cursor.Position.X + viewportCursor.X) / tileSize);
+                int cursorTileY = (int)((cursor.Position.Y + viewportCursor.Y) / tileSize);
                 if (!(cursorTileX > world.Width || cursorTileY > world.Height || cursorTileX < 0 || cursorTileY < 0))
                 {
                     Tile t = world.Get(cursorTileX, cursorTileY);
@@ -338,7 +340,7 @@ namespace Infinitum
                 foreach (var gameObject in previousSelection)
                     if (gameObject.Visual.Children.Contains(selectionBorder))
                         gameObject.Visual.Children.Remove(selectionBorder);
-                Tile t = world.Get((cursor.Position.Xi + viewportCursor.Xi) / tileSize, (cursor.Position.Yi + viewportCursor.Yi) / tileSize);
+                Tile t = world.Get((int)((cursor.Position.X + viewportCursor.X) / tileSize), (int)((cursor.Position.Y + viewportCursor.Y) / tileSize));
                 if (t != null)
                 {
                     if (t.SelectionEnabled)
@@ -642,12 +644,12 @@ namespace Infinitum
 
         public bool PointInTriangle(Vec2 v, Vec2 a, Vec2 b, Vec2 c)
         {
-            float c1 = Vec2.Cross(c - b, v - b);
-            float c2 = Vec2.Cross(c - b, a - b);
-            float c3 = Vec2.Cross(c - a, v - a);
-            float c4 = Vec2.Cross(b - c, a - c);
-            float c5 = Vec2.Cross(b - a, v - a);
-            float c6 = Vec2.Cross(b - a, c - a);
+            float c1 = Vectors.Vec2.Cross(c - b, v - b);
+            float c2 = Vectors.Vec2.Cross(c - b, a - b);
+            float c3 = Vectors.Vec2.Cross(c - a, v - a);
+            float c4 = Vectors.Vec2.Cross(b - c, a - c);
+            float c5 = Vectors.Vec2.Cross(b - a, v - a);
+            float c6 = Vectors.Vec2.Cross(b - a, c - a);
             bool test1 = c1 * c2 >= 0;
             bool test2 = c3 * c4 >= 0;
             bool test3 = c5 * c6 >= 0;

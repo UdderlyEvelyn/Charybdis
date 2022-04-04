@@ -74,7 +74,7 @@ namespace Charybdis.MonoGame
 
         public static Microsoft.Xna.Framework.Rectangle ToXNA(this Rect r)
         {
-            return new Microsoft.Xna.Framework.Rectangle(r.Xi, r.Yi, r.Wi, r.Hi);
+            return new Microsoft.Xna.Framework.Rectangle((int)r.X, (int)r.Y, (int)r.W, (int)r.H);
         }
 
         public static Rect ToCharybdis(this Microsoft.Xna.Framework.Rectangle r)

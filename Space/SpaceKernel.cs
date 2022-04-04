@@ -14,6 +14,8 @@ using Charybdis.Science;
 using Charybdis.MonoGame;
 using Charybdis.MonoGame.Framework;
 using Rectangle = Charybdis.MonoGame.Rectangle;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Space
 {
@@ -448,12 +450,12 @@ namespace Space
 
         public bool PointInTriangle(Vec2 v, Vec2 a, Vec2 b, Vec2 c)
         {
-            float c1 = Vec2.Cross(c - b, v - b);
-            float c2 = Vec2.Cross(c - b, a - b);
-            float c3 = Vec2.Cross(c - a, v - a);
-            float c4 = Vec2.Cross(b - c, a - c);
-            float c5 = Vec2.Cross(b - a, v - a);
-            float c6 = Vec2.Cross(b - a, c - a);
+            float c1 = Vectors.Vec2.Cross(c - b, v - b);
+            float c2 = Vectors.Vec2.Cross(c - b, a - b);
+            float c3 = Vectors.Vec2.Cross(c - a, v - a);
+            float c4 = Vectors.Vec2.Cross(b - c, a - c);
+            float c5 = Vectors.Vec2.Cross(b - a, v - a);
+            float c6 = Vectors.Vec2.Cross(b - a, c - a);
             bool test1 = c1 * c2 >= 0;
             bool test2 = c3 * c4 >= 0;
             bool test3 = c5 * c6 >= 0;

@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Charybdis.Library.Core;
 using Charybdis.Science;
 using Charybdis.MonoGame;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Space
 {
@@ -26,7 +28,7 @@ namespace Space
             Radius = r.NextDouble() * 6.9; //Largest exoplanet is a puffy gas giant at 6.9 Jupiter radii.
             Position = new Vec2((float)(hostStar.Position.X + Scale.ParsecsToSolarPixels(r.NextDouble())),
                                 (float)(hostStar.Position.Y + Scale.ParsecsToSolarPixels(r.NextDouble())));
-            Temperature = new Temperature(Maths.InverseSquare(hostStar.Temperature.Value, Vec3.Distance(hostStar.Position, Position), Maths.SphereArea(Radius) / 2));
+            Temperature = new Temperature(Maths.InverseSquare(hostStar.Temperature.Value, hostStar.Position.Distance(Position), Maths.SphereArea(Radius) / 2));
             Visual = visual;
 
             var spriteVisual = Visual as Sprite;

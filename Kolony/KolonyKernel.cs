@@ -12,6 +12,8 @@ using System.Diagnostics;
 using Charybdis.Library.Core;
 using Charybdis.Science;
 using Charybdis.MonoGame;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Kolony
 {
@@ -73,6 +75,7 @@ namespace Kolony
         static Vec2 cubeScale = new Vec2(2);
         static Vec2 halfCubeScale = cubeScale / 2;
         static Vec2 cubeSize;
+        float zoomLevel = 1f;
 
         public KolonyKernel()
         {
@@ -128,10 +131,11 @@ namespace Kolony
             Material.Sand.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeSand.png");
             Material.Grey.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeGrey.png");
             Material.Air.Texture = Material.Grey.Texture;
-            cubeSize = Material.Grey.Texture.Bounds.Size.ToVector2().ToCharybdis();
+            cubeSize = Material.Grey.Texture.Bounds.Size.ToVector2();
             Console.Write("Done!");
             Console.WriteLine();
             Console.Write("Spawning Cubes..");
+            float highestPoint = heightmap.Array.OrderByDescending(x => x).First();
             for (int y = 0; y < worldHeight; y++)
             {
                 for (int x = 0; x < worldWidth; x++)
@@ -161,7 +165,7 @@ namespace Kolony
                         else
                             invalidHeight = true;
                         var sprite = new Sprite(material.Texture, pos, cubeScale);
-                        int depthColor = (int)(layer / (float)worldDepth * 255f);
+                        int depthColor = (int)((layer / (highestPoint * (float)worldDepth)) * 255f);
                         sprite.Tint = new Col4(depthColor, depthColor, depthColor);
                         cube = new Cube()
                         {
@@ -405,6 +409,7 @@ namespace Kolony
             //Mouse Handling
             previousMouseState = activeMouseState;
             activeMouseState = Mouse.GetState();
+            zoomLevel = activeMouseState.ScrollWheelValue;
             //if (activeMouseState.Position.X < 0 || activeMouseState.Position.Y < 0 || activeMouseState.Position.X > width || activeMouseState.Position.Y > height) //If mouse isn't in window..
             //    return; //Don't handle mouse.
             cursor.Position = new Vec2(activeMouseState.Position.X, activeMouseState.Position.Y);
@@ -610,12 +615,12 @@ namespace Kolony
 
         public bool PointInTriangle(Vec2 v, Vec2 a, Vec2 b, Vec2 c)
         {
-            float c1 = Vec2.Cross(c - b, v - b);
-            float c2 = Vec2.Cross(c - b, a - b);
-            float c3 = Vec2.Cross(c - a, v - a);
-            float c4 = Vec2.Cross(b - c, a - c);
-            float c5 = Vec2.Cross(b - a, v - a);
-            float c6 = Vec2.Cross(b - a, c - a);
+            float c1 = Vectors.Vec2.Cross(c - b, v - b);
+            float c2 = Vectors.Vec2.Cross(c - b, a - b);
+            float c3 = Vectors.Vec2.Cross(c - a, v - a);
+            float c4 = Vectors.Vec2.Cross(b - c, a - c);
+            float c5 = Vectors.Vec2.Cross(b - a, v - a);
+            float c6 = Vectors.Vec2.Cross(b - a, c - a);
             bool test1 = c1 * c2 >= 0;
             bool test2 = c3 * c4 >= 0;
             bool test3 = c5 * c6 >= 0;

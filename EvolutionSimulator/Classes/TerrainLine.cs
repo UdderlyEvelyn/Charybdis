@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Charybdis.Library.Core;
 using Charybdis.MonoGame;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace EvolutionSimilator
 {

@@ -8,6 +8,8 @@ using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
 using GraphicsDevice = Microsoft.Xna.Framework.Graphics.GraphicsDevice;
 using BoundingBox = Microsoft.Xna.Framework.BoundingBox;
 using System.Runtime.CompilerServices;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {
@@ -65,12 +67,12 @@ namespace Charybdis.MonoGame
             if (!DrawMe)
                 return; //Set to not draw, so abort the drawing process.        
             spriteBatch.Draw(_data,
-                position: (Position - offset + Origin).ToXNA(),
+                position: Position - offset + Origin,
                 sourceRectangle: null,//new Microsoft.Xna.Framework.Rectangle(Position.Xi, Position.Yi, Size.Xi, Size.Yi),
                 color: DrawAlternateTint ? AlternateTint.ToXNA() : (Tint.HasValue ? Tint.Value.ToXNA() : Microsoft.Xna.Framework.Color.White),
                 rotation: Rotation,
-                origin: Origin.ToXNA(),
-                scale: Scale.ToXNA(),
+                origin: Origin,
+                scale: Scale,
                 effects: Effects,
                 layerDepth: PositionBasedDepthEnabled ? GetPositionBasedDepth(offset) : Depth);
             if (DrawChildren)

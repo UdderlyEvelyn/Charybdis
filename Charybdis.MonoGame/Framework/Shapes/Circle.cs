@@ -21,7 +21,7 @@ namespace Charybdis.MonoGame
         public Circle(float radius)
         {
             Radius = radius;
-            DirectionalBiasFunction = angle => Maths.CirclePointAtAngle(Radius.Value, angle);
+            DirectionalBiasFunction = angle => Maths.CirclePointAtAngle(Radius.Value, angle).ToXNA();
         }
     }
 }

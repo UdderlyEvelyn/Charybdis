@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Charybdis.Library.Core;
 using Microsoft.Xna.Framework.Graphics;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {
@@ -22,10 +24,10 @@ namespace Charybdis.MonoGame
 
         public Square(float size)
         {
-            Vec2 A = Vec2.ZZ; //Top Left
-            Vec2 B = Vec2.PZ * size; //Top Right
-            Vec2 C = Vec2.PP * size; //Bottom Right
-            Vec2 D = Vec2.ZP * size; //Bottom Left
+            Vec2 A = Vectors.Vec2.ZZ; //Top Left
+            Vec2 B = Vectors.Vec2.PZ * size; //Top Right
+            Vec2 C = Vectors.Vec2.PP * size; //Bottom Right
+            Vec2 D = Vectors.Vec2.ZP * size; //Bottom Left
             Segments = new List<LineSegment>
             {
                 new LineSegment(A, B), //Top

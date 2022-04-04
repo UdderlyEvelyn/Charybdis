@@ -9,6 +9,8 @@ using Charybdis.Library.Core;
 using Charybdis.MonoGame;
 using System.Collections.Concurrent;
 using System.Threading;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace EvolutionSimulator
 {

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Charybdis.Library.Core;
 using Microsoft.Xna.Framework.Graphics;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {
@@ -25,7 +27,7 @@ namespace Charybdis.MonoGame
             set
             {
                 _text = value;
-                Resize(Font.CalculateTextSize(value) + Padding * 2);
+                Resize(Font.CalculateTextSize(value) + new Vec2(Padding * 2));
             }
         }
 
@@ -51,9 +53,9 @@ namespace Charybdis.MonoGame
 
             base.Draw(spriteBatch, offset);
             if (TextShadowColor.HasValue)
-                spriteBatch.DrawShadowedString(Font, Text, effectivePosition + Padding, TextColor, Vec2.One, TextShadowColor.Value);
+                spriteBatch.DrawShadowedString(Font, Text, effectivePosition +  new Vec2(Padding), TextColor, Vec2.One, TextShadowColor.Value);
             else
-                spriteBatch.DrawString(Font, Text, effectivePosition + Padding, TextColor);
+                spriteBatch.DrawString(Font, Text, effectivePosition + new Vec2(Padding), TextColor);
 
             if (DrawChildren)
                 foreach (var child in Children)

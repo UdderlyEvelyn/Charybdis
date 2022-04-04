@@ -155,6 +155,7 @@ namespace Charybdis.MonoGame
                 return _rotation.Z;
             }
         }
+
         public Vec3 Position
         {
             get
@@ -181,6 +182,7 @@ namespace Charybdis.MonoGame
                 UpdateLookAt();
             }
         }
+
         public Vec3 Look
         {
             get

@@ -10,6 +10,8 @@ using Microsoft.Xna.Framework;
 using Charybdis.Neural;
 using System.Collections.Concurrent;
 using Charybdis.MonoGame;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace EvolutionSimulator
 {
@@ -288,7 +290,7 @@ namespace EvolutionSimulator
             _lastOutputs = new double[Network.OutputCount];
             float spawnAngle = (float)0d.Wrap(Random.NextDouble() * 360, 0, 360);
             Direction = Maths.CirclePosition((float)parent.Size.Value, spawnAngle);
-            Position = Globals.WorldWrapIfNecessary(parent.Position, Maths.CirclePointAtAngle((float)parent.Size.Value / 2, spawnAngle));
+            Position = Globals.WorldWrapIfNecessary(parent.Position, Maths.CirclePointAtAngle((float)parent.Size.Value / 2, spawnAngle).ToXNA());
             visionLineC2 = new Line(Position, Position) { Color = new Col3(128, 128, 128) };
             visionLineL2 = new Line(Position, Position) { Color = new Col3(0, 0, 128) };
             visionLineR2 = new Line(Position, Position) { Color = new Col3(128, 0, 0) };
@@ -483,33 +485,33 @@ namespace EvolutionSimulator
 
                 _historyIndex = _historyIndex.Wrap(1, 0, _historyDepth - 1);
 
-                Vec2 visionTarget1 = Position + Maths.CirclePointAtAngle(1, Direction);
+                Vec2 visionTarget1 = Position + Maths.CirclePointAtAngle(1, Direction).ToXNA();
                 var vTile1 = FindTileAtTarget(visionTarget1);
                 var biomassInVision1 = vTile1 != null ? (vTile1 is ArableTile ? ((ArableTile)vTile1).BiomassRatio : 0) : 0;
                 var difficultyInVision1 = vTile1 != null ? vTile1.MovementCostMultiplier : 1;
 
-                Vec2 visionTarget = Position + Maths.CirclePointAtAngle((float)Globals.CentralVisionDistance, Direction);
+                Vec2 visionTarget = Position + Maths.CirclePointAtAngle((float)Globals.CentralVisionDistance, Direction).ToXNA();
                 var vTileC = FindTileAtTarget(visionTarget);
                 var biomassInVisionC = vTileC != null ? (vTileC is ArableTile ? ((ArableTile)vTileC).BiomassRatio : 0) : 0;
                 var difficultyInVisionC = vTileC != null ? vTileC.MovementCostMultiplier : 1;
-                Vec2 visionTargetL = Position + Maths.CirclePointAtAngle((float)Globals.PeripheralVisionDistance, Direction - Globals.PeripheralVisionAngle);
+                Vec2 visionTargetL = Position + Maths.CirclePointAtAngle((float)Globals.PeripheralVisionDistance, Direction - Globals.PeripheralVisionAngle).ToXNA();
                 var vTileL = FindTileAtTarget(visionTargetL);
                 var biomassInVisionL = vTileL != null ? (vTileL is ArableTile ? ((ArableTile)vTileL).BiomassRatio : 0) : 0;
                 var difficultyInVisionL = vTileL != null ? vTileL.MovementCostMultiplier : 1;
-                Vec2 visionTargetR = Position + Maths.CirclePointAtAngle((float)Globals.PeripheralVisionDistance, Direction + Globals.PeripheralVisionAngle);
+                Vec2 visionTargetR = Position + Maths.CirclePointAtAngle((float)Globals.PeripheralVisionDistance, Direction + Globals.PeripheralVisionAngle).ToXNA();
                 var vTileR = FindTileAtTarget(visionTargetR);
                 var biomassInVisionR = vTileR != null ? (vTileR is ArableTile ? ((ArableTile)vTileR).BiomassRatio : 0) : 0;
                 var difficultyInVisionR = vTileR != null ? vTileR.MovementCostMultiplier : 1;
 
-                Vec2 visionTarget2 = Position + Maths.CirclePointAtAngle((float)Globals.CentralFarVisionDistance, Direction);
+                Vec2 visionTarget2 = Position + Maths.CirclePointAtAngle((float)Globals.CentralFarVisionDistance, Direction).ToXNA();
                 var vTileC2 = FindTileAtTarget(visionTarget2);
                 var biomassInVisionC2 = vTileC2 != null ? (vTileC2 is ArableTile ? ((ArableTile)vTileC2).BiomassRatio : 0) : 0;
                 var difficultyInVisionC2 = vTileC2 != null ? vTileC2.MovementCostMultiplier : 1;
-                Vec2 visionTargetL2 = Position + Maths.CirclePointAtAngle((float)Globals.PeripheralFarVisionDistance, Direction - Globals.PeripheralFarVisionAngle);
+                Vec2 visionTargetL2 = Position + Maths.CirclePointAtAngle((float)Globals.PeripheralFarVisionDistance, Direction - Globals.PeripheralFarVisionAngle).ToXNA();
                 var vTileL2 = FindTileAtTarget(visionTargetL2);
                 var biomassInVisionL2 = vTileL2 != null ? (vTileL2 is ArableTile ? ((ArableTile)vTileL2).BiomassRatio : 0) : 0;
                 var difficultyInVisionL2 = vTileL2 != null ? vTileL2.MovementCostMultiplier : 1;
-                Vec2 visionTargetR2 = Position + Maths.CirclePointAtAngle((float)Globals.PeripheralFarVisionDistance, Direction + Globals.PeripheralFarVisionAngle);
+                Vec2 visionTargetR2 = Position + Maths.CirclePointAtAngle((float)Globals.PeripheralFarVisionDistance, Direction + Globals.PeripheralFarVisionAngle).ToXNA();
                 var vTileR2 = FindTileAtTarget(visionTargetR2);
                 var biomassInVisionR2 = vTileR2 != null ? (vTileR2 is ArableTile ? ((ArableTile)vTileR2).BiomassRatio : 0) : 0;
                 var difficultyInVisionR2 = vTileR2 != null ? vTileR2.MovementCostMultiplier : 1;
@@ -608,7 +610,7 @@ namespace EvolutionSimulator
             //{
             //    System.IO.File.AppendAllText(ID + ".log", "\nException encountered during update of this creature:\n" + ex.ToString());
             //}
-            BoundingRect = new BoundingRect(Position, (float)Size.Value);
+            BoundingRect = new (Position.ToPoint(), new Point((int)Size.Value));
         }
 
         public void Die(ArableTile deathTile)

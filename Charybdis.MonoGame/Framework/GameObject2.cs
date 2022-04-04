@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Charybdis.Library.Core;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {
@@ -14,7 +16,7 @@ namespace Charybdis.MonoGame
         /// <summary>
         /// An object used for collision detection.
         /// </summary>
-        public BoundingRect BoundingRect;
+        public Microsoft.Xna.Framework.Rectangle BoundingRect;
 
         /// <summary>
         /// Visual component of this object.
@@ -31,7 +33,7 @@ namespace Charybdis.MonoGame
                 if (Visual != null)
                     return Visual.Position;
                 else
-                    return Vec2.NN;
+                    return -Vec2.One;
             }
             set
             {

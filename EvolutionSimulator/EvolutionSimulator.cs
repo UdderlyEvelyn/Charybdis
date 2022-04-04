@@ -16,6 +16,8 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Charybdis.MonoGame;
 using Charybdis.MonoGame.Framework;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace EvolutionSimulator
 {
@@ -114,8 +116,8 @@ namespace EvolutionSimulator
             font2.Scale = .5f;
             var cursorTexture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/Cursor21.png");
             cursor = new Sprite(cursorTexture);
-            infoWindow = new TextWindow("", font1, uiBorderColor, uiPanelColor, Col4.White) { Parent = cursor, Position = cursor.Size * 1.1 };
-            infoWindow.DrawMe = false; //Temporary, trying to figure out why it won't stop drawing when a check for .Text being null is put in place. -YK 1/25/19
+            infoWindow = new TextWindow("", font1, uiBorderColor, uiPanelColor, Col4.White) { Parent = cursor, Position = cursor.Size * new Vec2(1.1f) };
+            infoWindow.DrawMe = false; //Temporary, trying to figure out why it won't stop drawing when a check for .Text being null is put in place. -UdderlyEvelyn 1/25/19
             cursor.Children.Add(infoWindow);
 
             if (Globals.FitnessBasedEvolution)
@@ -335,8 +337,8 @@ namespace EvolutionSimulator
                 {
                     float colorValue = (float)(c.EffortHistory[i] * 255);
 
-                    new Line(directionGraphOrigin + Maths.CirclePointAtAngle(i, (float)(c.DirectionHistory[i])),
-                             directionGraphOrigin + Maths.CirclePointAtAngle(i + 1, (float)(c.DirectionHistory[i + 1])))
+                    new Line(directionGraphOrigin + Maths.CirclePointAtAngle(i, (float)(c.DirectionHistory[i])).ToXNA(),
+                             directionGraphOrigin + Maths.CirclePointAtAngle(i + 1, (float)(c.DirectionHistory[i + 1])).ToXNA())
                     { Color = new Col3(colorValue, 0, colorValue) }
                     .Draw(spriteBatch, Vec2.Zero);
 
@@ -345,10 +347,10 @@ namespace EvolutionSimulator
                     { Color = new Col3(colorValue, 0, colorValue) }
                     .Draw(spriteBatch, Vec2.Zero);
                 }
-                new Line(directionGraphOrigin + Vec2.NZ * 4, directionGraphOrigin + Vec2.PZ * 4) { Color = Col3.White }.Draw(spriteBatch, Vec2.Zero);
-                new Line(directionGraphOrigin + Vec2.ZN * 4, directionGraphOrigin + Vec2.ZP * 4) { Color = Col3.White }.Draw(spriteBatch, Vec2.Zero);
-                new Line(directionDeltaGraphOrigin + Vec2.NZ * 4, directionDeltaGraphOrigin + Vec2.PZ * 4) { Color = Col3.White }.Draw(spriteBatch, Vec2.Zero);
-                new Line(directionDeltaGraphOrigin + Vec2.ZN * 4, directionDeltaGraphOrigin + Vec2.ZP * 4) { Color = Col3.White }.Draw(spriteBatch, Vec2.Zero);
+                new Line(directionGraphOrigin + Vectors.Vec2.NZ * 4, directionGraphOrigin + Vectors.Vec2.PZ * 4) { Color = Col3.White }.Draw(spriteBatch, Vec2.Zero);
+                new Line(directionGraphOrigin + Vectors.Vec2.ZN * 4, directionGraphOrigin + Vectors.Vec2.ZP * 4) { Color = Col3.White }.Draw(spriteBatch, Vec2.Zero);
+                new Line(directionDeltaGraphOrigin + Vectors.Vec2.NZ * 4, directionDeltaGraphOrigin + Vectors.Vec2.PZ * 4) { Color = Col3.White }.Draw(spriteBatch, Vec2.Zero);
+                new Line(directionDeltaGraphOrigin + Vectors.Vec2.ZN * 4, directionDeltaGraphOrigin + Vectors.Vec2.ZP * 4) { Color = Col3.White }.Draw(spriteBatch, Vec2.Zero);
             }
         }
 
@@ -649,13 +651,12 @@ namespace EvolutionSimulator
             previousMouseState = activeMouseState;
             activeMouseState = Mouse.GetState();
             cursor.Position = new Vec2(activeMouseState.Position.X, activeMouseState.Position.Y);
-            var mousePosition = new Vector3(activeMouseState.Position.X, activeMouseState.Position.Y, 0);
             if (previousMouseState.LeftButton == ButtonState.Released && activeMouseState.LeftButton == ButtonState.Pressed) //Handle left mouse press when it was previously released (to respond only once to a click).
             {
                 //Left Click
                 Globals.CreaturesLock.EnterReadLock();
-                //For some reason the bounding box is sometimes null, shouldn't need to check, it's a workaround for that.. -YK 1/7/19
-                Selector.SelectMany(Globals.Creatures.Where(c => c.BoundingRect != null && c.BoundingRect.ToXNA().Contains(mousePosition) != ContainmentType.Disjoint));
+                //For some reason the bounding box is sometimes null, shouldn't need to check, it's a workaround for that.. -UdderlyEvelyn 1/7/19
+                Selector.SelectMany(Globals.Creatures.Where(c => c.BoundingRect != null && c.BoundingRect.Contains(cursor.Position)));
                 Globals.CreaturesLock.ExitReadLock();
             }
             if (previousMouseState.RightButton == ButtonState.Released && activeMouseState.RightButton == ButtonState.Pressed) //Handle right mouse press when it was previously released (to respond only once to a click).
@@ -765,12 +766,12 @@ namespace EvolutionSimulator
 
         public bool PointInTriangle(Vec2 v, Vec2 a, Vec2 b, Vec2 c)
         {
-            float c1 = Vec2.Cross(c - b, v - b);
-            float c2 = Vec2.Cross(c - b, a - b);
-            float c3 = Vec2.Cross(c - a, v - a);
-            float c4 = Vec2.Cross(b - c, a - c);
-            float c5 = Vec2.Cross(b - a, v - a);
-            float c6 = Vec2.Cross(b - a, c - a);
+            float c1 = Vectors.Vec2.Cross(c - b, v - b);
+            float c2 = Vectors.Vec2.Cross(c - b, a - b);
+            float c3 = Vectors.Vec2.Cross(c - a, v - a);
+            float c4 = Vectors.Vec2.Cross(b - c, a - c);
+            float c5 = Vectors.Vec2.Cross(b - a, v - a);
+            float c6 = Vectors.Vec2.Cross(b - a, c - a);
             bool test1 = c1 * c2 >= 0;
             bool test2 = c3 * c4 >= 0;
             bool test3 = c5 * c6 >= 0;

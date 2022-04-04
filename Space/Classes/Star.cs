@@ -9,6 +9,8 @@ using Charybdis.Science;
 using Charybdis.MonoGame;
 using Charybdis.Library.Core.Classes;
 using Range = Charybdis.Library.Core.Range;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Space
 {
@@ -26,7 +28,8 @@ namespace Space
             var spriteVisual = Visual as Sprite;
             if (spriteVisual != null)
                 spriteVisual.Tint = Temperature.GetColor();
-            BoundingRect = new BoundingRect(visual.Position, visual.Position + visual.Size);
+            var extent = visual.Position + visual.Size;
+            BoundingRect = new (visual.Position.ToPoint(), new Microsoft.Xna.Framework.Point((int)extent.X, (int)extent.Y));
         }
 
         private Temperature _temperature;

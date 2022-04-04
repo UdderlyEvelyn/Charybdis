@@ -16,6 +16,8 @@ using System.IO;
 using BoundingBox = Microsoft.Xna.Framework.BoundingBox;
 using Charybdis.Library.Core;
 using Index = Charybdis.Library.Core.Index;
+using Vec2 = Microsoft.Xna.Framework.Vector2;
+using Vec3 = Microsoft.Xna.Framework.Vector3;
 
 namespace Charybdis.MonoGame
 {
@@ -140,12 +142,12 @@ namespace Charybdis.MonoGame
 
         public static void DrawTexture(this SpriteBatch spriteBatch, Vec2 position, Texture2D texture)
         {
-            spriteBatch.Draw(texture, position.ToXNA(), Color.White);
+            spriteBatch.Draw(texture, position, Color.White);
         }
 
         public static void DrawPixel(this SpriteBatch spriteBatch, Vec2 position, Col3 c)
         {
-            spriteBatch.Draw(WhiteTexture, position.ToXNA(), c.ToXNA());
+            spriteBatch.Draw(WhiteTexture, position, c.ToXNA());
         }
 
         public static void DrawPixel(this SpriteBatch spriteBatch, float x, float y, Col3 c)
@@ -165,8 +167,8 @@ namespace Charybdis.MonoGame
 
         public static void DrawLine(this SpriteBatch spriteBatch, Vec2 origin, Vec2 destination, Col4 color, float thickness = 1, float depth = 0)
         {
-            Vector2 o = origin.ToXNA();
-            Vector2 d = destination.ToXNA();
+            Vector2 o = origin;
+            Vector2 d = destination;
             float distance = Vector2.Distance(o, d);
             float angle = (float)Math.Atan2(d.Y - o.Y, d.X - o.X);
             spriteBatch.DrawLine(o, distance, angle, thickness, color, depth);
@@ -428,7 +430,9 @@ namespace Charybdis.MonoGame
 
         public static Vec3 GetNormal(IVertex a, IVertex b, IVertex c)
         {
-            return Vec3.Cross(b.Position - a.Position, c.Position - a.Position).Normalize();
+            var result = Vec3.Cross((b.Position - a.Position).ToXNA(), (c.Position - a.Position).ToXNA());
+            result.Normalize();
+            return result;
         }
 
         #region Text
@@ -594,7 +598,7 @@ namespace Charybdis.MonoGame
         {
             for (int i = 0; i < vpcs.Count(); i++)
             {
-                vpcs[i].Position += v.ToXNA();
+                vpcs[i].Position += v;
             }
             return vpcs;
         }
