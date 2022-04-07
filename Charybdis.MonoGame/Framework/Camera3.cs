@@ -13,7 +13,7 @@ using Charybdis.Library.Core;
 
 namespace Charybdis.MonoGame
 {
-    public class Camera : GameComponent
+    public class Camera3 : GameComponent
     {
         protected Vec3 _look = Vec3.Zero;
         protected Vec3 _position = Vec3.Zero;
@@ -206,7 +206,7 @@ namespace Charybdis.MonoGame
             GenerateFrustum();
         }
 
-        public Camera(Game game) : base(game)
+        public Camera3(Game game) : base(game)
         {
 
         }

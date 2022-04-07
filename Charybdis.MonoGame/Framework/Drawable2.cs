@@ -12,6 +12,10 @@ namespace Charybdis.MonoGame
 {
     public abstract class Drawable2 : IDrawable2
     {
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            Draw(spriteBatch, Vec2.Zero);
+        }
         public abstract void Draw(SpriteBatch spriteBatch, Vec2 offset);
         public Vec2 Position;
         public Vec2 Size;

@@ -33,8 +33,8 @@ namespace Kolony
         //static int width = worldTileWidth * tileSize; 
         //static int height = worldTileHeight * tileSize;
         //static int size = width * height;
-        int viewportWidth = 1920;
-        int viewportHeight = 1080;
+        static int viewportWidth = 1920;
+        static int viewportHeight = 1080;
         Vec2 viewportCursor = Vec2.Zero;
         //Vec2 lastSelectedPosition = Vec2.Zero;
         float viewportSpeedX = (int)(1920 / 1080) * 10;
@@ -47,6 +47,7 @@ namespace Kolony
         RasterizerState rasterizerState;
         DepthStencilState depthStencilState;
         SpriteBatch spriteBatch;
+        SpriteBatch uiSpriteBatch;
         double seed;
         Font returnOfGanon;
         Font smallFonts;
@@ -75,7 +76,9 @@ namespace Kolony
         static Vec2 cubeScale = new Vec2(2);
         static Vec2 halfCubeScale = cubeScale / 2;
         static Vec2 cubeSize;
-        float zoomLevel = 1f;
+        Camera2 camera;
+        BasicEffect spriteEffect;
+        bool viewportDebug = false;
 
         public KolonyKernel()
         {
@@ -95,8 +98,14 @@ namespace Kolony
         {
             Window.Position = Point.Zero;
             Globals.GraphicsDevice = GraphicsDevice;
-            GraphicsDevice.Viewport = new Viewport(0, 0, Globals.Width, Globals.Height); //This is needed for release builds to show the borderless window properly (otherwise it renders the top left chunk across the screen and the rest is out of bounds).
+            spriteEffect = new BasicEffect(GraphicsDevice);
+            spriteEffect.LightingEnabled = false;
+            spriteEffect.FogEnabled = false;
+            spriteEffect.TextureEnabled = true;
+            GraphicsDevice.Viewport = new Viewport((int)viewportCursor.X, (int)viewportCursor.Y, viewportWidth, viewportHeight); //This is needed for release builds to show the borderless window properly (otherwise it renders the top left chunk across the screen and the rest is out of bounds).
+            camera = new Camera2(viewportWidth, viewportHeight);
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            uiSpriteBatch = new SpriteBatch(GraphicsDevice);
             rasterizerState = new RasterizerState { CullMode = CullMode.CullClockwiseFace, FillMode = FillMode.Solid };
             depthStencilState = new DepthStencilState { DepthBufferEnable = true, DepthBufferFunction = CompareFunction.Less };
             XNA.Initialize2D(GraphicsDevice);
@@ -201,8 +210,8 @@ namespace Kolony
 
         public Vec2 GridToWorld(Vec2 position, float z)
         {
-            var x = position.X * cubeSize.X * halfCubeScale.X;
-            var y = position.Y * cubeSize.Y * halfCubeScale.Y;
+            var x = position.X * cubeSize.X * halfCubeScale.X;// + (viewportWidth * .5f); //half viewport adjustments intended to compensate for camera2 issues
+            var y = position.Y * cubeSize.Y * halfCubeScale.Y;// + (viewportHeight * .5f);
             var halfSizeY = cubeSize.Y * cubeScale.Y / 2;
             var halfSizeX = cubeSize.X * cubeScale.X / 2;
             //var halfSizeY = cubeSize.Y * halfCubeScale.Y / 2;
@@ -216,9 +225,24 @@ namespace Kolony
             return new Vec2(x, y);
         }
 
+        public Vec2 GridToScreen(Vec2 position, float z)
+        {
+            return camera.WorldToScreen(GridToWorld(position, z));
+        }
+
+        public Vec2 ScreenToGrid(Vec2 position)
+        {
+            return WorldToGrid(camera.ScreenToWorld(position));
+        }
+
         protected override bool BeginDraw()
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);//, DepthStencilState.Default);
+            camera.Update();
+            //spriteEffect.World = Matrix.Identity;
+            //spriteEffect.View = camera.View;
+            //spriteEffect.Projection = camera.Projection;
+            uiSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: camera.Translation); //effect: spriteEffect);//, DepthStencilState.Default);
             return base.BeginDraw();
         }
 
@@ -242,9 +266,9 @@ namespace Kolony
                     for (int z = worldDepth - 1; z >= 0; z--)
                     {
                         var c = world.Get(x, y, z);
-                        if (c.Visual.Position.Within(viewportCursor, viewportMax))
+                        if (camera.WithinView(c.Visual.Position))
                         {
-                            c.Visual.Draw(spriteBatch, viewportCursor);
+                            c.Visual.Draw(spriteBatch);
                             objectsDrawn++;
                         }
                     }
@@ -256,24 +280,39 @@ namespace Kolony
             //    }
             if (cubeCoordinateDebug)
                 foreach (var go2 in Globals.AllGameObjects)
-                    if (go2.Visual != null && go2.Visual.Position.Within(viewportCursor, viewportMax))
-                    {
-                        var cube = go2 as Cube;
-                        spriteBatch.DrawLine(go2.Visual.Position - viewportCursor, cursor.Position, Col4.Green, 2, 1);
-                        spriteBatch.DrawLine(cube.Coordinates.TopFaceCenter - viewportCursor, cursor.Position, Col4.Purple, 2, 1);
-                        spriteBatch.DrawLine(cube.Coordinates.LeftFaceCenter - viewportCursor, cursor.Position, Col4.Blue, 2, 1);
-                        spriteBatch.DrawLine(cube.Coordinates.RightFaceCenter - viewportCursor, cursor.Position, Col4.Red, 2, 1);
-                    }
-
+                {
+                    var cube = go2 as Cube;
+                    if (!cube.SelectionEnabled)
+                        continue;
+                    uiSpriteBatch.DrawLine(camera.WorldToScreen(go2.Visual.Position), cursor.Position, Col4.Green, 2, 1);
+                    uiSpriteBatch.DrawLine(camera.WorldToScreen(cube.Coordinates.TopFaceCenter), cursor.Position, Col4.Purple, 2, 1);
+                    uiSpriteBatch.DrawLine(camera.WorldToScreen(cube.Coordinates.LeftFaceCenter), cursor.Position, Col4.Blue, 2, 1);
+                    uiSpriteBatch.DrawLine(camera.WorldToScreen(cube.Coordinates.RightFaceCenter), cursor.Position, Col4.Red, 2, 1);
+                }
+            if (viewportDebug)
+            {
+                uiSpriteBatch.DrawLine(viewportCursor - viewportCursor, viewportMax - viewportCursor, Col4.Red);
+                uiSpriteBatch.DrawLine(new Vec2(viewportCursor.X, viewportMax.Y) - viewportCursor, new Vec2(viewportMax.X, viewportCursor.Y) - viewportCursor, Col4.Blue);
+                Vec2 topLeft = new Vec2(camera.Position.X - 10, camera.Position.Y - 10) - viewportCursor;
+                Vec2 topRight = new Vec2(camera.Position.X + 10, camera.Position.Y - 10) - viewportCursor;
+                Vec2 bottomRight = new Vec2(camera.Position.X + 10, camera.Position.Y + 10) - viewportCursor;
+                Vec2 bottomLeft = new Vec2(camera.Position.X - 10, camera.Position.Y + 10) - viewportCursor;
+                uiSpriteBatch.DrawLine(topLeft, topRight, Col4.Green);
+                uiSpriteBatch.DrawLine(topRight, bottomRight, Col4.Green);
+                uiSpriteBatch.DrawLine(bottomRight, bottomLeft, Col4.Green);
+                uiSpriteBatch.DrawLine(bottomLeft, topLeft, Col4.Green);
+            }
             //Globals.VisualsLock.ExitReadLock();
-            
-            spriteBatch.DrawShadowedString(returnOfGanon,
+
+            uiSpriteBatch.DrawShadowedString(returnOfGanon,
                 "Charybdis2D Kernel - " + frameRate + "FPS - " + memUsage + "MB" + "\n" +
                 "World Size: " + worldWidth + "x" + worldHeight + "\n" +
                 "Viewport Cursor: " + viewportCursor.ToString() + "\n" +
                 "Viewport Max: " + viewportMax.ToString() + "\n" +
                 "Local Cursor: " + cursor.Position.ToString() + "\n" +
                 "Absolute Cursor: " + (cursor.Position + viewportCursor).ToString() + "\n" +
+                "Camera Zoom: " + camera.Zoom + "\n" +
+                "Camera Position: " + camera.Position + "\n" +
                 "Objects Drawn: " + objectsDrawn + "\n" +
                 "Selection Count: " + selection.Count + "\n" +
                 "Day Progress: " + (((double)dayProgress / (double)secondsPerDay) * 100).Round() + "%\n" +
@@ -290,7 +329,6 @@ namespace Kolony
                 if (c != null)
                 {
                     var sprite = (Sprite)c.Visual;
-                    var worldCursorPosition = cursor.Position + viewportCursor;
                     infoWindow.Text =
                         "Material: " + c.Material.Name + "\n" +
                         "Position: " + c.Position + "\n" +
@@ -311,13 +349,13 @@ namespace Kolony
                     //var scaledSize = c.Visual.Size * ((Sprite)c.Visual).Scale;
                     //The Y/2 is cube-specific to point at center of top face.
                     //var lineTarget = c.Visual.Position + new Vec2(scaledSize.X, scaledSize.Y / 2) / 2;
-                    spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), c.Coordinates.TopFaceCenter - viewportCursor, Col4.White, 3);
+                    uiSpriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), camera.WorldToScreen(c.Coordinates.TopFaceCenter), Col4.White, 3);
                     //Below is what it was before adjusting for isometry or cubes.
                     //spriteBatch.DrawLine(infoWindow.Position + (infoWindow.Size / 2), c.Visual.Position + (c.Visual.Size / 2) - viewportCursor, Col4.White, 3);
-                    infoWindow.Draw(spriteBatch, Vec2.Zero);
+                    infoWindow.Draw(uiSpriteBatch);
                 }
             }
-            spriteBatch.DrawSprite(cursor); //Draw cursor last so it's always on top.
+            uiSpriteBatch.DrawSprite(cursor); //Draw cursor last so it's always on top.
             //if (selection.Count == 0)
             //{
             //    var cursorTile = WorldToGrid(cursor.Position + viewportCursor);
@@ -335,6 +373,7 @@ namespace Kolony
         protected override void EndDraw()
         {
             spriteBatch.End();
+            uiSpriteBatch.End();
             base.EndDraw();
         }
 
@@ -409,7 +448,12 @@ namespace Kolony
             //Mouse Handling
             previousMouseState = activeMouseState;
             activeMouseState = Mouse.GetState();
-            zoomLevel = activeMouseState.ScrollWheelValue;
+
+            var oldScroll = previousMouseState.ScrollWheelValue;
+            var newScroll = activeMouseState.ScrollWheelValue;
+            if (oldScroll != newScroll) //Scrolling happened..
+                //Clamp between 10-1000% zoom and nearest .1, go by 10% of current zoom level (so, relative zoom speed) but nearest .1 increment, direction dependent on scroll direction.
+                camera.Zoom = MathF.Min(10, MathF.Max(.1f, MathF.Round(camera.Zoom + MathF.Max(.1f, MathF.Round(camera.Zoom * .1f, 1)) * MathF.Sign(newScroll - oldScroll), 1)));
             //if (activeMouseState.Position.X < 0 || activeMouseState.Position.Y < 0 || activeMouseState.Position.X > width || activeMouseState.Position.Y > height) //If mouse isn't in window..
             //    return; //Don't handle mouse.
             cursor.Position = new Vec2(activeMouseState.Position.X, activeMouseState.Position.Y);
@@ -451,7 +495,7 @@ namespace Kolony
                     //The Y/2 is cube-specific to point at top face instead of actual center.
                     //var cubeExtent = c.Visual.Position + new Vec2(scaledSize.X, scaledSize.Y / 2);
                     //if ((cursor.Position + viewportCursor).Within(c.Visual.Position, cubeExtent))
-                    if (c.Coordinates.WithinTopFace(cursor.Position + viewportCursor))
+                    if (c.Coordinates.WithinTopFace(camera.ScreenToWorld(cursor.Position)))
                     {
                         c.Selected = true;
                         ((Sprite)c.Visual).DrawAlternateTint = true;
@@ -475,22 +519,22 @@ namespace Kolony
                 //        gameObject.Visual.Children.Remove(selectionBorder);
                 //selectionBorder.Parent = null;
             }
-            if (previousMouseState.MiddleButton == ButtonState.Released && activeMouseState.MiddleButton == ButtonState.Pressed) //Middle mouse button
-            {
-                if (selection.Count > 0)
-                {
-                    Cube c = (Cube)selection[0];
-                    MessageBox.Show("Cube Stats",
-                                    "Position: " + c.Position + "\n" +
-                                    "Visual Position: " + c.Visual.Position + "\n" +
-                                    "WorldToGrid Position: " + WorldToGrid(c.Position) + "\n" +
-                                    "WorldToGrid Visual.Position: " + WorldToGrid(c.Visual.Position) + "\n" +
+            //if (previousMouseState.MiddleButton == ButtonState.Released && activeMouseState.MiddleButton == ButtonState.Pressed) //Middle mouse button
+            //{
+            //    if (selection.Count > 0)
+            //    {
+            //        Cube c = (Cube)selection[0];
+            //        MessageBox.Show("Cube Stats",
+            //                        "Position: " + c.Position + "\n" +
+            //                        "Visual Position: " + c.Visual.Position + "\n" +
+            //                        "WorldToGrid Position: " + WorldToGrid(c.Position) + "\n" +
+            //                        "WorldToGrid Visual.Position: " + WorldToGrid(c.Visual.Position) + "\n" +
 
-                        "Cursor In Top Face: " + c.Coordinates.WithinTopFace(cursor.Position)
-                                    , new string[] { "OK" });
-                }
-                else MessageBox.Show("Cube Stats", "No cube selected.", new string[] { "OK" });
-            }
+            //            "Cursor In Top Face: " + c.Coordinates.WithinTopFace(cursor.Position)
+            //                        , new string[] { "OK" });
+            //    }
+            //    else MessageBox.Show("Cube Stats", "No cube selected.", new string[] { "OK" });
+            //}
         }
 
         public void KeyboardHandler(GameTime gameTime)
@@ -511,22 +555,22 @@ namespace Kolony
             if (dDown && !dUp)
             {
                 //if (viewportCursor.Y + viewportHeight < height)
-                    viewportCursor.Y += viewportSpeedY;
+                camera.Position.Y = viewportCursor.Y += viewportSpeedY / camera.Zoom;
             }
             if (dUp && !dDown)
             {
                 //if (viewportCursor.Y > 0)
-                    viewportCursor.Y -= viewportSpeedY;
+                camera.Position.Y = viewportCursor.Y -= viewportSpeedY / camera.Zoom;
             }
             if (dRight && !dLeft)
             {
                 //if (viewportCursor.X + viewportWidth < width)
-                    viewportCursor.X += viewportSpeedX;
+                camera.Position.X = viewportCursor.X += viewportSpeedX / camera.Zoom;
             }
             if (dLeft && !dRight)
             {
                 //if (viewportCursor.X > 0)
-                    viewportCursor.X -= viewportSpeedX;
+                camera.Position.X = viewportCursor.X -= viewportSpeedX / camera.Zoom;
             }
             if (ks.IsKeyDown(Keys.Space) && previousKeyboardState.IsKeyUp(Keys.Space))
             {
@@ -542,6 +586,8 @@ namespace Kolony
                 applyTemperatureColor = !applyTemperatureColor;
             if (ks.IsKeyDown(Keys.C) && previousKeyboardState.IsKeyUp(Keys.C))
                 cubeCoordinateDebug = !cubeCoordinateDebug;
+            if (ks.IsKeyDown(Keys.V) && previousKeyboardState.IsKeyUp(Keys.V))
+                viewportDebug = !viewportDebug;
             if (ks.IsKeyDown(Keys.R) && previousKeyboardState.IsKeyUp(Keys.R)) //Select a random cube that isn't the one that's already selected.
             {
                 Cube old = null;
