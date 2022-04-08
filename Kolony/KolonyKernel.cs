@@ -25,7 +25,7 @@ namespace Kolony
         static int secondsPerDay = minutesPerDay * 60;
         static int tileSize = 32;
         //static int tileHalfSize = tileSize / 2;
-        static int worldWidth = 24;
+        static int worldWidth = 32;
         static int worldHeight = 24;
         static int worldDepth = 20;
         static int worldCountPerLayer = worldWidth * worldHeight;
@@ -178,6 +178,7 @@ namespace Kolony
                         sprite.Tint = new Col4(depthColor, depthColor, depthColor);
                         cube = new Cube()
                         {
+                            GridPosition = new Vec3(x, y, z),
                             TMP_Density = density,
                             Depth = layer,
                             Position = pos,
@@ -235,6 +236,17 @@ namespace Kolony
             return WorldToGrid(camera.ScreenToWorld(position));
         }
 
+        public bool ShouldCull(Cube c)
+        {
+            if (c.Material == Material.Air) //If it's air..
+                return true; //Cull it, we don't draw air.
+            if (c.GridPosition.Z + 1 >= worldDepth) //Top of grid.
+                return false; //Don't cull, we already made sure it's not air and this is at the top so it's visible.
+            if (world[(int)c.GridPosition.Z + 1].Get((int)c.GridPosition.X, (int)c.GridPosition.Y).Material != Material.Air) //Cube above this one is not air, so it's covered up..
+                return true; //Cull it, can't see it.
+            return false; //Nothing else, so don't cull it.
+        }
+
         protected override bool BeginDraw()
         {
             camera.Update();
@@ -266,7 +278,7 @@ namespace Kolony
                     for (int z = worldDepth - 1; z >= 0; z--)
                     {
                         var c = world.Get(x, y, z);
-                        if (camera.WithinView(c.Visual.Position))
+                        if (camera.WithinView(c.Visual.Position) && !ShouldCull(c))
                         {
                             c.Visual.Draw(spriteBatch);
                             objectsDrawn++;
@@ -523,14 +535,13 @@ namespace Kolony
             //{
             //    if (selection.Count > 0)
             //    {
-            //        Cube c = (Cube)selection[0];
+            //        Cube c = (Cube)selection[0]; 
+            //        var gridPosition = WorldToGrid(c.Position); //Get grid pos
+            //        var ca = world[(int)c.Depth + 1].Get((int)gridPosition.X, (int)gridPosition.Y);
             //        MessageBox.Show("Cube Stats",
             //                        "Position: " + c.Position + "\n" +
-            //                        "Visual Position: " + c.Visual.Position + "\n" +
-            //                        "WorldToGrid Position: " + WorldToGrid(c.Position) + "\n" +
-            //                        "WorldToGrid Visual.Position: " + WorldToGrid(c.Visual.Position) + "\n" +
-
-            //            "Cursor In Top Face: " + c.Coordinates.WithinTopFace(cursor.Position)
+            //                        "Cube Above Material Type: " + ca.Material.Name + "\n" +
+            //                        "Should Cull: " + ShouldCull(c)
             //                        , new string[] { "OK" });
             //    }
             //    else MessageBox.Show("Cube Stats", "No cube selected.", new string[] { "OK" });

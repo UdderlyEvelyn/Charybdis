@@ -15,6 +15,7 @@ namespace Kolony
     public class Cube : KolonyObject
     {
         public float TMP_Density = 0;
+        public Vec3 GridPosition;
 
         public Cube()
         {
