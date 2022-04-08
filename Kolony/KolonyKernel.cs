@@ -255,11 +255,11 @@ namespace Kolony
                 return false; //Can't cull, can see top.
             Array2<Cube> layer = world[(int)c.GridPosition.Z];
             bool cubeDownLeftExists;
-            if ((cubeDownLeftExists = layer.Get((int)c.GridPosition.X, yPlusOne).Material != Material.Air) && layer.Get(xPlusOne, (int)c.GridPosition.Y).Material != Material.Air) //Cube down-left and down-right of this one both exist,
-                return true; //Can't see it due to other blocks, so cull it.
-            if (!cubeDownLeftExists //The cube that would obscure the left face isn't there,
+            if (!(cubeDownLeftExists = layer.Get((int)c.GridPosition.X, yPlusOne).Material != Material.Air) //The cube that would obscure the left face isn't there,
                 && layerAbove.Get((int)c.GridPosition.X - 1, yPlusOne).Material != Material.Air) //If it's on the far left and the cube to the left doesn't exist and nothing obscures view to the cube from above and to the bottom left,
                 return false; //Can't cull, can see left side.
+            if (cubeDownLeftExists && layer.Get(xPlusOne, (int)c.GridPosition.Y).Material != Material.Air) //Cube down-left and down-right of this one both exist,
+                return true; //Can't see it due to other blocks, so cull it.
             return true; //Nothing else, cull by default.
         }
 
