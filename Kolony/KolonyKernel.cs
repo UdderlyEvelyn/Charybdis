@@ -23,9 +23,8 @@ namespace Kolony
         double dayProgress = 0;
         static int minutesPerDay = 3;
         static int secondsPerDay = minutesPerDay * 60;
-        static int tileSize = 32;
         //static int tileHalfSize = tileSize / 2;
-        static int worldWidth = 32;
+        static int worldWidth = 24;
         static int worldHeight = 24;
         static int worldDepth = 20;
         static int worldCountPerLayer = worldWidth * worldHeight;
@@ -75,6 +74,7 @@ namespace Kolony
         //Cube cubeAtCursor = null;
         static Vec2 cubeScale = new Vec2(2);
         static Vec2 halfCubeScale = cubeScale / 2;
+        static Vec2 quarterCubeScale = cubeScale / 4;
         static Vec2 cubeSize;
         Camera2 camera;
         BasicEffect spriteEffect;
@@ -211,12 +211,12 @@ namespace Kolony
 
         public Vec2 GridToWorld(Vec2 position, float z)
         {
-            var x = position.X * cubeSize.X * halfCubeScale.X;// + (viewportWidth * .5f); //half viewport adjustments intended to compensate for camera2 issues
-            var y = position.Y * cubeSize.Y * halfCubeScale.Y;// + (viewportHeight * .5f);
-            var halfSizeY = cubeSize.Y * cubeScale.Y / 2;
-            var halfSizeX = cubeSize.X * cubeScale.X / 2;
-            //var halfSizeY = cubeSize.Y * halfCubeScale.Y / 2;
-            return new Vec2(x, y + (x/2) + (halfSizeY * z));
+            var x = position.X * cubeSize.X * halfCubeScale.X;
+            var y = position.Y * cubeSize.Y * halfCubeScale.Y;
+            var halfSizeY = cubeSize.Y * cubeScale.Y * .5f;
+            return new Vec2(x - y, (y * .5f) + (x * .5f) + (halfSizeY * z));
+            //x - halfY, y + halfX ends up as a lined up regular grid again..
+            //x - y, y + x makes it a more even isometry..
         }
 
         public Vec2 WorldToGrid(Vec2 position)
@@ -236,15 +236,30 @@ namespace Kolony
             return WorldToGrid(camera.ScreenToWorld(position));
         }
 
+        //X=0 and the cube at Y+1 doesn't exist due to X=0, is not drawing - should only do this if cube Z-1 Y+1 is present.
         public bool ShouldCull(Cube c)
         {
             if (c.Material == Material.Air) //If it's air..
                 return true; //Cull it, we don't draw air.
             if (c.GridPosition.Z + 1 >= worldDepth) //Top of grid.
                 return false; //Don't cull, we already made sure it's not air and this is at the top so it's visible.
-            if (world[(int)c.GridPosition.Z + 1].Get((int)c.GridPosition.X, (int)c.GridPosition.Y).Material != Material.Air) //Cube above this one is not air, so it's covered up..
-                return true; //Cull it, can't see it.
-            return false; //Nothing else, so don't cull it.
+            var xPlusOne = (int)c.GridPosition.X + 1;
+            if (xPlusOne >= worldWidth) //If this cube is against the right edge of the world,
+                return false; //Can't cull, can see right side.
+            var yPlusOne = (int)c.GridPosition.Y + 1;
+            if (yPlusOne >= worldHeight) //If this cube is against the left edge of the world,
+                return false; //Can't cull, can see left side.
+            Array2<Cube> layerAbove = world[(int)c.GridPosition.Z - 1];
+            if (layerAbove.Get((int)c.GridPosition.X, (int)c.GridPosition.Y).Material == Material.Air) //Cube above (Z) doesn't exist,
+                return false; //Can't cull, can see top.
+            Array2<Cube> layer = world[(int)c.GridPosition.Z];
+            bool cubeDownLeftExists;
+            if ((cubeDownLeftExists = layer.Get((int)c.GridPosition.X, yPlusOne).Material != Material.Air) && layer.Get(xPlusOne, (int)c.GridPosition.Y).Material != Material.Air) //Cube down-left and down-right of this one both exist,
+                return true; //Can't see it due to other blocks, so cull it.
+            if (!cubeDownLeftExists //The cube that would obscure the left face isn't there,
+                && layerAbove.Get((int)c.GridPosition.X - 1, yPlusOne).Material != Material.Air) //If it's on the far left and the cube to the left doesn't exist and nothing obscures view to the cube from above and to the bottom left,
+                return false; //Can't cull, can see left side.
+            return true; //Nothing else, cull by default.
         }
 
         protected override bool BeginDraw()
@@ -275,14 +290,13 @@ namespace Kolony
             //var viewportBounds = new BoundingRect(viewportCursor - tileSize, viewportMax);
             for (int y = 0; y < worldHeight; y++)
                 for (int x = 0; x < worldWidth; x++)
-                    for (int z = worldDepth - 1; z >= 0; z--)
+                    for (int z = worldDepth - 1; z >= 0; z--) //Grid Z goes other way.
                     {
                         var c = world.Get(x, y, z);
-                        if (camera.WithinView(c.Visual.Position) && !ShouldCull(c))
-                        {
-                            c.Visual.Draw(spriteBatch);
-                            objectsDrawn++;
-                        }
+                        if (!camera.WithinView(c.Visual.Position) || ShouldCull(c))
+                            continue;
+                        c.Visual.Draw(spriteBatch);
+                        objectsDrawn++;
                     }
             //foreach (var go2 in Globals.AllGameObjects)
             //    if (go2.Visual != null && go2.Visual.Position.Within(viewportCursor, viewportMax))
