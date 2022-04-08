@@ -137,6 +137,7 @@ namespace Kolony
             Console.Write("Setting Up Textures From \"" + Content.RootDirectory + "/Textures\"..");
             Material.Stone.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeStone.png");
             Material.Soil.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeSoil.png");
+            Material.Grass.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeGrass.png");
             Material.Sand.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeSand.png");
             Material.Grey.Texture = GraphicsDevice.Texture2DFromFile(Content.RootDirectory + "/Textures/cubeGrey.png");
             Material.Air.Texture = Material.Grey.Texture;
@@ -153,20 +154,21 @@ namespace Kolony
                     {
                         float layer = (float)worldDepth - 1 - (float)z; //0 is lowest, flip for sensible number..
                         //double temperature = ((double)(temperatureField.Get(x, y) * 100)).Round();
-                        float density = densityField.Get(x, y, z) * (z * .5f); //Get density and adjust it so that lower cubes are more dense on average (for now, simple way to make things sensible).
+                        float density = densityField.Get(x, y, z) * (z * .4f); //Get density and adjust it so that lower cubes are more dense on average (for now, simple way to make things sensible).
                         Cube cube = null;
                         //Tile gen logic by density would go here..
 
                         var pos = GridToWorld(new Vec2(x, y), z);
-                        var textureBounds = Material.Stone.Texture.Bounds;
 
                         Material material = Material.Air;
 
+                        var height = (int)((float)heightmap.Get(x, y) * (float)worldDepth);
                         bool invalidHeight = false;
-                        if (layer <= (float)heightmap.Get(x, y) * (float)worldDepth) //If this position has enough height to exist..
+                        if (layer <= height) //If this position has enough height to exist..
                             material = density switch
                             {
-                                _ when density < Material.Soil.Density => Material.Sand,
+                                _ when density < Material.Grass.Density => Material.Sand,
+                                _ when density < Material.Soil.Density && layer == height => Material.Grass,
                                 _ when density < Material.Stone.Density => Material.Soil,
                                 _ when density < Material.Grey.Density => Material.Stone,
                                 _ => Material.Grey,
@@ -236,7 +238,6 @@ namespace Kolony
             return WorldToGrid(camera.ScreenToWorld(position));
         }
 
-        //X=0 and the cube at Y+1 doesn't exist due to X=0, is not drawing - should only do this if cube Z-1 Y+1 is present.
         public bool ShouldCull(Cube c)
         {
             if (c.Material == Material.Air) //If it's air..
@@ -538,12 +539,16 @@ namespace Kolony
                 {
                     gameObject.Selected = false;
                     (gameObject.Visual as Sprite).DrawAlternateTint = false;
-                }   
+                }
                 selection.Clear();
                 //foreach (var gameObject in previousSelection)
                 //    if (gameObject.Visual.Children.Contains(selectionBorder))
                 //        gameObject.Visual.Children.Remove(selectionBorder);
                 //selectionBorder.Parent = null;
+            }
+            if (previousMouseState.MiddleButton == ButtonState.Released && activeMouseState.MiddleButton == ButtonState.Pressed) //Middle mouse button
+            {
+
             }
             //if (previousMouseState.MiddleButton == ButtonState.Released && activeMouseState.MiddleButton == ButtonState.Pressed) //Middle mouse button
             //{

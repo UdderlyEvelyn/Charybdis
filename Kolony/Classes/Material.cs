@@ -28,6 +28,8 @@ namespace Kolony
 
         public static Material Soil = new Material("Soil", 2);
 
+        public static Material Grass = new Material("Grass", 1.5f);
+
         public static Material Sand = new Material("Sand", 1);
 
         public static Material Grey = new Material("Grey", 999);
